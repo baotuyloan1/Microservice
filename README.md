@@ -22,3 +22,15 @@ AGENDA:
 
 
 [Evolution Of Microservices architecture](EvolutionOfMicroServicesArchitecture.md)
+
+We need to build REST Services.
+Using REST services, we can establish synchronous communication between multiple APIS or multiple services or multiple web applications.
+Synchronous communication means when a request comes from an external application to my microservice
+The external application is going to wait for my response so that it can proceed to the next request.
+Off course, synchronous communication is not the only option that we have to build microservices.
+This is the mostly commonly used approach in this project.
+
+**Implementing REST Services**
+
+REST(Representational state transfer)services are one of the most often encountered ways to implement communication between two web apps.
+REST offers access to functionality the server exposes through endpoints a client can call.![img_8.png](img_8.png)
