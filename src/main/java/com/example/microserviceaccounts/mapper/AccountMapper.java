@@ -2,6 +2,7 @@ package com.example.microserviceaccounts.mapper;
 
 import com.example.microserviceaccounts.dto.AccountDto;
 import com.example.microserviceaccounts.entity.Account;
+import com.example.microserviceaccounts.entity.Customer;
 
 public class AccountMapper {
 

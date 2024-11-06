@@ -6,7 +6,7 @@ import lombok.*;
 
 @Entity
 @Setter @Getter @ToString @AllArgsConstructor @NoArgsConstructor
-public class Account {
+public class Account extends BaseEntity{
 
     private Long customerId;
 

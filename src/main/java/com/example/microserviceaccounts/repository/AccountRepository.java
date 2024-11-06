@@ -1,7 +1,37 @@
 package com.example.microserviceaccounts.repository;
 
 import com.example.microserviceaccounts.entity.Account;
+import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+
+import java.util.Optional;
 
 public interface AccountRepository extends JpaRepository<Account, Long> {
+
+    Optional<Account> findByCustomerId(Long customerId);
+
+
+    /**
+     * The two annotations above are used to make sure the delete operation is transactional
+     * and also to make sure the changes are persisted to the database.
+     *
+     * The reason we are using these two annotations is as follows:
+     *
+     * 1. @Transactional: This annotation is used to demarcate where a transaction begins and ends.
+     * The database transaction happens inside the scope of a persistence context.
+     *
+     * 2. @Modifying: This annotation is used to mark a query method as modifying.
+     * This annotation is used to mark a query method that modifies the database.
+     *
+     * By using these two annotations, Spring Data JPA is smart enough to create a transactional scope
+     * for the delete operation and also to make sure the changes are persisted to the database.
+     *
+     * if there is some error happens at the runtime, any partial change of data that is resulted due to the queries
+     * will be rolled back because the entire transaction will be rolled back by the spring data JPA
+     * and we are in safe hands.
+     */
+    @Transactional
+    @Modifying
+    void deleteByCustomerId(Long customerId);
 }
