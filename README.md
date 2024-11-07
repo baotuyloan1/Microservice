@@ -34,3 +34,6 @@ This is the mostly commonly used approach in this project.
 
 REST(Representational state transfer)services are one of the most often encountered ways to implement communication between two web apps.
 REST offers access to functionality the server exposes through endpoints a client can call.![img_8.png](img_8.png)
+
+**SWAGGER API:**
+http://localhost:8080/swagger-ui/index.html
