@@ -37,3 +37,13 @@ REST offers access to functionality the server exposes through endpoints a clien
 
 **SWAGGER API:**
 http://localhost:8080/swagger-ui/index.html
+
+**IMPORTANT ANNOTATIONS AND CLASSES that supports building REST Services**
+- @RestController - can be used to put on top of a call. This expose your methods as REST APIs. Developers can also use @Controller + @ResponseBody for same behavior.
+- @ResponseBody - can be used on top of a method to build a Rest API when we are using @Controller on top of a Jav class
+- @ControllerAdvice - is used to mark the class as a REST controller advice. Along with @ExceptionHandler, this can be used to handle exceptions globally inside app. We have another annotation @RestControllerAdvice which is same as @ControllerAdvice + @ResponseBody
+
+*Classes*
+- RequestEntity<T> - Allows developers to receive the request body, header in a HTTP request.
+- ResponseEntity<T> - Allow developers to send response body, status, and headers on the HTTP response
+- @RequestHeader & @RequestBody - is used to receive the request body and header individually.
