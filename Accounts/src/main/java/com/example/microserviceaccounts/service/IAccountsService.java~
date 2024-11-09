@@ -1,0 +1,12 @@
+package com.example.microserviceaccounts.service;
+
+import com.example.microserviceaccounts.dto.CustomerDto;
+
+public interface IAccountsService {
+
+    /**
+     * 
+     * @param customerDto
+     */
+    void createAccount(CustomerDto customerDto);
+}
