@@ -1,6 +1,6 @@
 package com.example.microserviceaccounts.constants;
 
-public class AccountConstants {
+public final class AccountConstants {
 
     /**
      * Private constructor to restrict instantiation.
