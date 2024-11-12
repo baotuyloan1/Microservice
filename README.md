@@ -21,7 +21,7 @@ AGENDA:
 
 
 
-[Evolution Of Microservices architecture](EvolutionOfMicroServicesArchitecture.md)
+[EvolutionOfMicroServicesArchitecture.md](Accounts%2FEvolutionOfMicroServicesArchitecture.md)
 
 We need to build REST Services.
 Using REST services, we can establish synchronous communication between multiple APIS or multiple services or multiple web applications.
@@ -33,10 +33,12 @@ This is the mostly commonly used approach in this project.
 **Implementing REST Services**
 
 REST(Representational state transfer)services are one of the most often encountered ways to implement communication between two web apps.
-REST offers access to functionality the server exposes through endpoints a client can call.![img_8.png](img_8.png)
+REST offers access to functionality the server exposes through endpoints a client can call.
 
 **SWAGGER API:**
-http://localhost:8080/swagger-ui/index.html
+Accounts : http://localhost:8080/swagger-ui/index.html
+Loans:  http://localhost:8090/swagger-ui/index.html
+Cards:  http://localhost:9000/swagger-ui/index.html
 
 **IMPORTANT ANNOTATIONS AND CLASSES that supports building REST Services**
 - @RestController - can be used to put on top of a call. This expose your methods as REST APIs. Developers can also use @Controller + @ResponseBody for same behavior.
