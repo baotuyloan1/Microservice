@@ -9,9 +9,11 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.example</groupId>
-    <artifactId>MicroserviceAccounts</artifactId>
+    <artifactId>Accounts</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>MicroserviceAccounts</name>
+<!--    jar is a good format that we can follow whenever we want to generate a Docker image-->
+    <packaging>jar</packaging>
+    <name>Accounts</name>
     <description>MicroserviceAccounts</description>
     <url/>
     <licenses>

@@ -49,3 +49,31 @@ Cards:  http://localhost:9000/swagger-ui/index.html
 - RequestEntity<T> - Allows developers to receive the request body, header in a HTTP request.
 - ResponseEntity<T> - Allow developers to send response body, status, and headers on the HTTP response
 - @RequestHeader & @RequestBody - is used to receive the request body and header individually.
+
+
+**BUILDING MICROSERVICES**
+
+One of the most challenging aspects of building a successful microservices system is the identification of proper microservice boundaries and defining the size of each microservice.
+Below are the mose common followed approaches in the industry:
+- Domain-Driven Sizing: Since many of our modifications or enhancements driven by the business needs, we can size/define boundaries of our microservices that are closely aligned with Domain-Driven design & Business capabilities. But this process takes lot of time and need good domain knowledge
+  - Disadvantage: it's time-consuming and it also needs a lot of people who has good understanding on the business and domain to overcome these challenges
+  - Advantage: 
+- Event Storming Sizing: conducting an interactive fun session among various stake holder to identify the list of important evens in the system like 'Completed Payment', 'Search for a Product' etc. Base on the events we can identify 'Commands', ' Reactions' and can try to group them to a domain-driven services.
+  - Advantage: Fast, straightforward, Engaging,Effective
+    - reference: https://www.lucidchart.com/blog/ddd-event-storming
+
+  
+![img_9.png](img_9.png)
+
+- Anyone who wants to communicate with my microservice, first they need to talk with my API gateway.
+- Using API gateway, my client application, they can invoke my rest APIs or microservices
+- All these microservices, including API gateway is deployed as a Docker containers inside a Kubernetes cluster.
+- Each microservice, they can have their own supporting database. They can follow their own programming language or framework.
+- Can also implement event streaming with the help of Event Bus like Kafka, RabbitMQ.
+- Whenever an authentication trying to happen, you can trigger an SMS to the customer for his OTP, so that you can do asynchronously with the help of event streaming. Similarly, whenever an order is confirmed, you can send an SMS or email to the customer asynchronously with the help of event streaming.
+
+*GENERATE DOCKER IMAGES*
+- Dockerfile -> accounts
+- Buildpacks (maven using Buildpacks) -> loans
+  - Buildpacks is a project initiated and developed by Heroku and Pivotal based upon the best practices
+  - Google Jib (open source with Java Tool, and with the Maven plugin command) ->cards
