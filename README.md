@@ -73,7 +73,34 @@ Below are the mose common followed approaches in the industry:
 - Whenever an authentication trying to happen, you can trigger an SMS to the customer for his OTP, so that you can do asynchronously with the help of event streaming. Similarly, whenever an order is confirmed, you can send an SMS or email to the customer asynchronously with the help of event streaming.
 
 *GENERATE DOCKER IMAGES*
-- Dockerfile -> accounts
-- Buildpacks (maven using Buildpacks) -> loans
+- Dockerfile -> accounts - [README.md](Accounts%2FREADME.md)
+- Buildpacks (maven using Buildpacks) -> loans - [README.md](Loans%2FREADME.md)
   - Buildpacks is a project initiated and developed by Heroku and Pivotal based upon the best practices
-  - Google Jib (open source with Java Tool, and with the Maven plugin command) ->cards
+- Google Jib (open source with Java Tool, and with the Maven plugin command) ->cards -[README.md](Cards%2FREADME.md)
+
+
+**Compare Dockerfile, Buildpacks, Jib approaches**
+- Docker file:
+  - Disadvantages: 
+    - You need to be an expert to write a Docker file
+    - You need to follow all the production standards and best practices by yourself
+    - The Docker files have to be maintained for all your microservices
+  - Advantages:
+    - This Dockerfile will give a lot of flexibility to you. If you have any custom requirements while you are generating a Docker image, you can achieve all of them with the help of Docker file approach.
+- Buildpacks:
+  - Disadvantages:
+    - You have to accept what they are supporting
+  - Advantages:
+    - Advanced Caching
+    - Bill-of-Materials
+    - Multi-language
+    - Modular/Pluggable
+    - Multi-process...
+- Jib:
+  - Disadvantages:
+    - You have to accept what they are 
+  - Advantages: 
+    - Take very less time to generate a Docker image.
+    - Take less memory inside my system
+
+=> If  you have any such custom requirements, you can always follow these Docker file approach.
