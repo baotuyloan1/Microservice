@@ -73,3 +73,15 @@ Steps to be followed:
 ![img_6.png](img_6.png)
 3. Execute the docker command "docker build . -t baotuyloan1/accounts:241114"from the location where Dockerfile is present. This will generate the docker image based on the tag name provided.
 4. Execute the docker command "docker run -p 8080:8080 baotuyloan1/accounts:241114" to start the container. This will start the docker container based on the docker image name and port mapping provided
+
+**DISADVANTAGE OF Docker file**
+- the very first disadvantage is in order to write a Docker file, you need to be an expert of Docker concepts. Right now we have very basic Docker file where I have given very basic Docker instructions.
+- But in real projects, if your application is large, this simple Docker file may not work for you. So to convert your microservices a Docker image, you need to learn a lot of Docker concepts
+- And at the same time, apart from learning the concepts of Docker, you should also follow the best practices when you try to generate a Docker image. The best practices like your Docker image should be as small as possible.
+- And apart from these standards, we should also not ignore any security related concept. We should make sure our Docker image is perfectly secured and there are no security vulnerabilities inside our Docker image. 
+
+=> So there is a lot of standards that you need to follow.
+
+- And in order to implement all these standards and in order to follow all these best practices, you need to put a lot of efforts, you need to learn Docker concept, you need to learn Docker best practices,  post that only you can implement all of them inside a Docker file.
+- If you have 100 different microservices, you need to maintain 100 different Docker files for them. And maintaining all these Docker files is another nightmare and there will be other challenges like versioning.
+- So there are many challenges that you are going to face with this approach. => Buildpacks and Google Job came into picture.
