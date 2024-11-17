@@ -104,3 +104,43 @@ Below are the mose common followed approaches in the industry:
     - Take less memory inside my system
 
 => If  you have any such custom requirements, you can always follow these Docker file approach.
+
+- To push docker image to repository (docker hub), you can use the command 
+```command
+docker image push docker.io/baotuyloan1/loans:241115
+```
+
+![img_10.png](img_10.png)
+
+make sure the link image is correct with username of docker desktop (docker hub). Your image name should have your username followed by your application name.
+
+![img_12.png](img_12.png)![img_11.png](img_11.png)
+
+```command
+docker compose up
+```
+or 
+```command
+docker compose up -d
+```
+-d for detach mode
+
+stop docker containers
+```command
+docker compose stop
+```
+
+stop and remove containers
+```command
+docker compose down
+```
+
+**Important Docker Commands**
+
+![img_13.png](img_13.png)
+![img_14.png](img_14.png)
+
+
+*Power Plugin in Docker Desktop*
+- Logs Explorer
+
