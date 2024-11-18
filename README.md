@@ -207,3 +207,13 @@ docker compose down
   - We should always treat these backing resources as attached resources so that we can modify or replace them without needing to make any changes inside your application code.
   - Whenever you want to change to your different database, instead doing it in the same code base, you need to provide these URL information, user information and password information form an external configuration
 ![img_17.png](img_17.png)
+- Environment parity:
+  - Minimize the differences between various environments of your application
+  - This environment parity recommends to make sure all your environments are looking exactly as much as possible
+  - There are three gaps that this factor addresses:
+    - Time gap: This methodology encourages automation and continuous deployment to reduce the time between code development to production deployment (for example using CI/CD)
+    - People gap: Developers create applications, while operators handle their deployment in production. To bridge this gap, a DevOps culture promotes collaboration between developers and operators, fostering the "you build it, you run it" philosophy
+    - Tools gap: for example: You shouldn't use H2 on development and PostgresSQL on production. You should use the same database for both development and production environments.
+- Administrative processes:
+  - Management tasks required to support applications, such as database migrations, batch jobs, or maintenance tasks, should be treated as isolated processes. 
+  - The code for these administrative or management task should be versioned control and packaged along with the application and executed within the same environment. 
