@@ -217,3 +217,61 @@ docker compose down
 - Administrative processes:
   - Management tasks required to support applications, such as database migrations, batch jobs, or maintenance tasks, should be treated as isolated processes. 
   - The code for these administrative or management task should be versioned control and packaged along with the application and executed within the same environment. 
+- Port binding:
+  - Using that port binding, we are exposing the microservice to external network
+  - Once this application is exposed at a specific port, then any other service or any clients they can invoke my microservice.
+  - Many applications are many microservices they want to communicate with each other.
+- Stateless processes:
+- Concurrency
+- Telemetry
+- Authentication and authorization
+
+**CONFIGURATION MANAGEMENT IN MICROSERVICES**
+- Separation of configs/properties: How do we separate the configurations/properties from the microservices so that same Docker image can be deployed in multiple environments.
+- Inject configs/properties: How do we inject configurations/properties that microservice needed during start up of the service.
+- Maintain Configs/properties: How do we maintain configurations/properties in a centralized repository along with versioning of them.
+
+
+**How CONFIGURATIONS work in SpringBoot**
+There are all the most commonly used approaches to provide the configurations inside SpringBoot applications:
+- Properties present inside files like (application.properties, application.yaml, ...). They will have the lowest priority or lowest preference.
+- Operating system environment variables
+- Java System properties (System.getProperties())
+- JNDI attributes from java:comp/env
+- ServletContext init parameters
+- ServletConfig init parameters
+- Command line arguments
+
+*Priority*
+- Command line arguments is going to have the highest priority
+- Whereas the properties that you have mentioned inside the application.properties is going to have the lowest priority
+
+
+**How to READ Properties IN SpringBoot apps**
+
+- Using @Value Annotation: You can use the @Value annotation to inject properties into your beans. This approach is suitable for injecting individual properties into specific fields.
+  - For example: @Value("${property.name}) private String propertyValue; Once you mention what is property key name with the format like this, during the start up of the application, SpringBoot will look for the property value inside all the places like application.properties, environment variables, system properties, JNDI attributes, servlet init parameters, command line arguments...
+- Using Environment: The Environment interface provides methods to access properties from the application's environment. You can autowire the Environment bean and use its methods to retrieve property values. This approach is more flexible and allows accessing properties programmatically. For example:
+```java
+@Autowired
+private Environment env;
+
+public String getProperty() {
+    String propertyValue = env.getProperty("property.name");
+}
+```
+
+- Using ConfigurationProperties @ConfigurationProperties. (Recommended this approach as it avoids hard coding the property keys)
+  - If you have many properties configured for you application, then using this approach
+  - You need to define all your properties inside your property file with a prefix value.
+  - The @ConfigurationProperties annotation enables binding of entire groups of properties to a bean. You define a configuration class with annotated fields matching the properties, and Spring Boot automatically maps the properties to the corresponding fields.
+```java
+@ConfigurationProperties(prefix = "prefix")
+public class MyConfig{
+    private String propertyValue;
+    
+    //getters and setters
+}
+```
+In this case, properties with the prefix "prefix" will be mapped to the fields of the MyConfig class.
+  
