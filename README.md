@@ -274,4 +274,13 @@ public class MyConfig{
 }
 ```
 In this case, properties with the prefix "prefix" will be mapped to the fields of the MyConfig class.
-  
+
+
+
+**Profiles in SpringBoot**
+- The default profile is always active
+- We can create another profiles by creating property files like below:
+  - application_prod.properties  -> for prod profile
+  - application_qa.properties -> for QA profile
+- We can active a specific profile using spring.profile.active property like below
+  - ```text spring.profiles.active=prod```
