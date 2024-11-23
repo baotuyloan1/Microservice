@@ -14,3 +14,14 @@ spring:
     hibernate:
       ddl-auto: update
     show-sql: true
+build:
+  version: "1.0"
+
+accounts:
+  message: "Welcome to EasyBank accounts related local APIs"
+  contactDetails:
+    name" : "Bao Nguyen"
+    email: "nguyenducbaokey@gmail.com"
+  onCallSupport:
+    - (+84) 788 049 042
+    - (+84) 123 456 789
