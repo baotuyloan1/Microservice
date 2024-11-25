@@ -20,7 +20,7 @@ spring:
       - "application_prod.yml"
   profiles:
     active:
-      - "qa_config"
+      - "prod"
 build:
   version: "3.0"
 

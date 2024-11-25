@@ -282,5 +282,69 @@ In this case, properties with the prefix "prefix" will be mapped to the fields o
 - We can create another profiles by creating property files like below:
   - application_prod.properties  -> for prod profile
   - application_qa.properties -> for QA profile
-- We can active a specific profile using spring.profile.active property like below
-  - ```text spring.profiles.active=prod```
+- We can activate a specific profile using spring.profile.active property like below
+  - ``` spring.profiles.active=prod```
+
+
+**How to externalize configurations using command-line arguments**
+
+Spring Boot automatically converts command-line arguments into key/value pairs and adds them to the Environment object.
+In a production application, this becomes the property source with the highest precedence. You can customize the application configuration by specifying command-line arguments when running the JAR you built earlier.
+```text
+java -jar accounts-service-0.0.1-SNAPSHOT.jar --spring.profiles.active="prod" --build.version="1.1"
+```
+The command-line argument follows the same naming convention as corresponding Spring property, with the --prefix for CLI arguments.
+
+**How to externalize configurations using JVM system properties**
+
+JVM system property, similar to command-line arguments, can override Spring properties with a lower priority.
+This approach allows for externalizing the configuration without the need to rebuild the JAR artifact.
+The JVM system property follows the same naming convention as corresponding Spring property, prefixed with -D for JVM arguments.
+In application, the message defined as a JVM system property will be utilized, taking precedence over property files.
+
+```text
+java -Dbuild.version="1.2 -jar accounts-service-0.0.1-SNAPSHOT.jar
+```
+
+**How to externalize configurations using environment variables**
+
+Environment variables are widely used for externalizing configurations as they offer portability across operating systems, they are universally supported.
+Most programming languages, including Java, provide mechanisms to access environment variables, such as System.getenv() method.
+
+To map a Spring property key to an environment variable, you need to convert all letters to uppercase and replace any dots or dashes with underscores.
+Spring Boot will handle this mapping correctly internally. For example, an environment variable named BUILD_VERSION will be recognized as the property build.version.
+This feature is known as relaxed binding.
+
+Windows
+```text
+env:BUILD_VERSION="1.3"; java -jar accounts-service-0.0.1-SNAPSHOT.jar
+```
+
+Linux based OS
+```text
+BUILD_VERSION="1.3" java -jar accounts-service-0.0.1-SNAPSHOT.jar
+```
+
+
+
+Activating the profile using command-line, JVM & environment options.
+- Command-line argument:
+![img_19.png](img_19.png)
+![img_18.png](img_18.png)
+```text
+--spring.profiles.active=qa_config --build.version=1.1
+```
+
+- JVM argument:
+```text
+-Dspring.profiles.active=prod -Dbuild.version=1.2
+```
+![img_21.png](img_21.png)
+![img_20.png](img_20.png)
+
+- Environment variables:
+![img_22.png](img_22.png)
+```text
+SPRING.PROFILES.ACTIVE=qa_config;BUILD.VERSION=1.9
+```
+
