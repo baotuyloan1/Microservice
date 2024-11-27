@@ -348,3 +348,24 @@ Activating the profile using command-line, JVM & environment options.
 SPRING.PROFILES.ACTIVE=qa_config;BUILD.VERSION=1.9
 ```
 
+
+**Spring Cloud Config**
+- Spring Boot can manage the configuration alone, but it has a lot of disadvantages.
+  - Using CLI arguments, JVM properties, and environment variables often involves executing separate commands and manually setting up the application, which can introduce potential errors during deployment.
+  - Sensitive information is stored in plain text.
+  - If you need to change the configuration, you need to restart the application...
+  
+=> Spring Cloud Config.
+
+Inside the spring ecosystem, there is a project with the name spring cloud config just to handle configurations inside any cloud.
+
+Centralized Configuration revolves two core elements:
+- You are free to store all your configurations or property files inside any location (like you can store inside a GitHub repository or inside a file system or inside a database).
+- A server that oversees the configuration data withing the data store, facilitating its management and distributing to multiple applications like microservices.
+
+![img_23.png](img_23.png)
+
+**What is Spring Cloud**
+
+Spring Cloud provides frameworks for developers to quickly build some of the common patterns of Microservices.
+![img_24.png](img_24.png)
