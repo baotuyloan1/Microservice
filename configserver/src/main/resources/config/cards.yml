@@ -1,0 +1,11 @@
+build:
+  version: "3.0"
+
+cards:
+  message: "Welcome to EasyBank cards related local APIs"
+  contactDetails:
+    name" : "Bao Nguyen"
+    email: "nguyenducbaokey@gmail.com"
+  onCallSupport:
+    - (+84) 788 049 042
+    - (+84) 123 456 789

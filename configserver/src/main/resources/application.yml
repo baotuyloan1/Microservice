@@ -1,2 +1,16 @@
+spring:
+  application:
+    name: "configserver"
+  profiles:
+#     whenever we are trying to use a classpath to store all our configuration,
+#    we need to make sure we are activating this native profile
+    active: native
+  cloud:
+    config:
+      server:
+#        we need to mention native because we activated the native profile
+        native:
+          search-locations: "classpath:/config"
+
 server:
   port: 8071

@@ -1,0 +1,12 @@
+```text
+http://localhost:8071/accounts/default
+```
+![img.png](img.png)
+```text
+http://localhost:8071/accounts/prod
+```
+![img_1.png](img_1.png)
+```text
+http://localhost:8071/accounts/qa
+```
+![img_2.png](img_2.png)
