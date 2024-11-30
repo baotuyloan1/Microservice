@@ -10,7 +10,10 @@ spring:
       server:
 #        we need to mention native because we activated the native profile
         native:
-          search-locations: "classpath:/config"
+#          reading configurations from a file system location.
+          search-locations: "file:///D://CODE//CODING//BE//Spring//Microservices//DemoForEasyBanking//propertiesConfig"
+#          reading configurations from the classpath location of Config server
+#          search-locations: "classpath:/config"
 
 server:
   port: 8071
