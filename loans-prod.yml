@@ -1,0 +1,11 @@
+build:
+  version: "2.0"
+
+loans:
+  message: "Welcome to EasyBank loans related prod APIs"
+  contactDetails:
+    name" : "Bao Nguyen - Product Owner"
+    email: "nguyenducbaokey@gmail.com"
+  onCallSupport:
+    - (+84) 788 049 042
+    - (+84) 123 456 789
