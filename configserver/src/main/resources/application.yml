@@ -2,18 +2,32 @@ spring:
   application:
     name: "configserver"
   profiles:
-#     whenever we are trying to use a classpath to store all our configuration,
-#    we need to make sure we are activating this native profile
-    active: native
+    active: git
+  #     whenever we are trying to use a classpath to store all our configuration,
+  #    we need to make sure we are activating this native profile
+  # only for file system location or classpath location
+  #    active: native
   cloud:
     config:
       server:
-#        we need to mention native because we activated the native profile
-        native:
-#          reading configurations from a file system location.
-          search-locations: "file:///D://CODE//CODING//BE//Spring//Microservices//DemoForEasyBanking//propertiesConfig"
+        #        we need to mention native because we activated the native profile
+#        native:
+          #          reading configurations from a file system location.
+#          search-locations: "file:///D://CODE//CODING//BE//Spring//Microservices//DemoForEasyBanking//propertiesConfig"
 #          reading configurations from the classpath location of Config server
 #          search-locations: "classpath:/config"
-
+        git:
+          uri: "https://github.com/baotuyloan1/EasyBankConfigFiles.git"
+          default-label: main
+#  after five seconds if it is not able to connect to my GitHub repo for whatever reason, the config server should immediately throw an exception.
+          timeout: 5
+# spring will clone the GitHub repo into local system during startup itself
+# when the very first request coming towards your config server, then it can not clone, and it can't read the configurations
+          #it will create some issues. that's why we need to make sure we are cloning the GitHub repo during the startup of the config server
+          clone-on-start: true
+# sometime, we have changed some local changes inside the local repo that we have cloned from GitHub
+          # by mention this force-pull as true, we are telling to override the local changes whenever we are trying to start or restart our config server.
+          # this will make sure your config server always reading the properties from the master location which is GitHub repo.
+          force-pull: true
 server:
   port: 8071

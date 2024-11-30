@@ -369,3 +369,7 @@ Centralized Configuration revolves two core elements:
 
 Spring Cloud provides frameworks for developers to quickly build some of the common patterns of Microservices.
 ![img_24.png](img_24.png)
+
+- reading configurations from classpath
+- reading configurations from a file system location
+- reading configurations from a GitHub repository
