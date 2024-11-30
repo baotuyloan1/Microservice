@@ -1,6 +1,10 @@
 server:
   port: 9000
 spring:
+  application:
+    name: "cards"
+  profiles:
+    active: "prod"
   datasource:
     url: jdbc:h2:mem:testdb
     driver-class-name: org.h2.Driver
@@ -15,20 +19,19 @@ spring:
       ddl-auto: update
     show-sql: true
   config:
-    import:
-      - "application_qa.yml"
-      - "application_prod.yml"
-  profiles:
-    active:
-      - "prod"
-build:
-  version: "3.0"
+    import: "optional:configserver:http://localhost:8071/"
+#    import:
+#      - "application_qa.yml"
+#      - "application_prod.yml"
 
-cards:
-  message: "Welcome to EasyBank cards related local APIs"
-  contactDetails:
-    name" : "Bao Nguyen"
-    email: "nguyenducbaokey@gmail.com"
-  onCallSupport:
-    - (+84) 788 049 042
-    - (+84) 123 456 789
+#build:
+#  version: "3.0"
+#
+#cards:
+#  message: "Welcome to EasyBank cards related local APIs"
+#  contactDetails:
+#    name" : "Bao Nguyen"
+#    email: "nguyenducbaokey@gmail.com"
+#  onCallSupport:
+#    - (+84) 788 049 042
+#    - (+84) 123 456 789

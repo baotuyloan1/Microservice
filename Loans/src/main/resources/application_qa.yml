@@ -1,16 +1,16 @@
-spring:
-  config:
-    activate:
-      on-profile: "qa"
-
-build:
-  version: "2.0"
-
-loans:
-  message: "Welcome to EasyBank loans related QA APIs"
-  contactDetails:
-    name" : "Bao Nguyen - QA Lead"
-    email: "nguyenducbaokey@gmail.com"
-  onCallSupport:
-    - (+84) 788 049 042
-    - (+84) 123 456 789
+#spring:
+#  config:
+#    activate:
+#      on-profile: "qa"
+#
+#build:
+#  version: "2.0"
+#
+#loans:
+#  message: "Welcome to EasyBank loans related QA APIs"
+#  contactDetails:
+#    name" : "Bao Nguyen - QA Lead"
+#    email: "nguyenducbaokey@gmail.com"
+#  onCallSupport:
+#    - (+84) 788 049 042
+#    - (+84) 123 456 789
