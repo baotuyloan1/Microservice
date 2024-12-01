@@ -40,3 +40,16 @@ spring:
 #  onCallSupport:
 #    - (+84) 788 049 042
 #    - (+84) 123 456 789
+  rabbitmq:
+    host: "localhost"
+    port: 5672
+    stream:
+      username: "guest"
+      password: "guest"
+
+management:
+  endpoints:
+    web:
+      exposure:
+        # spring boot actuator will enable and expose all management endpoint and inside these endpoints only we are also going to have refresh related endpoint.
+        include: "*"

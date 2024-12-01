@@ -373,3 +373,93 @@ Spring Cloud provides frameworks for developers to quickly build some of the com
 - reading configurations from classpath
 - reading configurations from a file system location
 - reading configurations from a GitHub repository
+
+
+**Refresh configurations at runtime using refresh actuator path**
+- make sure dependency actuator is added to pom.xml in every microservice instance.
+![img_25.png](img_25.png)
+
+
+- Spring Cloud Config Server: by default, it will refresh the configurations at runtime.
+- Spring Cloud Config Client: by default, will not refresh the configurations at runtime we need to use actuator path to refresh the configurations at runtime.
+
+
+Make sure config like this before using actuator. Because by default, this endpoint is not exposed, so you need to explicitly enable it in the application.yml file using below config:
+```yaml
+management:
+  endpoints:
+    web:
+      exposure:
+        # spring boot actuator will enable and expose all management endpoint and inside these endpoints only we are also going to have refresh related endpoint.
+        include: "*"
+```
+
+![img_26.png](img_26.png)
+```text
+--view all endpoints--
+localhost:8080/actuator
+localhost:8090/actuator
+localhost:9000/actuator
+
+
+localhost:8080/actuator/refresh
+localhost:8090/actuator/refresh
+localhost:9000/actuator/refresh
+
+```
+
+call api refresh will refresh the configurations after call the api instead of restarting the microservice instance.
+
+
+![img_27.png](img_27.png)
+
+
+**Spring Cloud Bus**
+- We have to invoke the refresh API for each microservice instance. Whenever we are trying to refresh the configurations at runtime without restart.
+
+=> Use Spring Cloud Bus to avoid this.
+
+Spring Cloud Bus links nodes of a distributed system with a lightweight message broker like RabbitMQ or Kafka.
+
+to install RabbitMQ use this command
+```text
+docker run -it --rm --name rabbitmq -p 5672:5672 -p 15672:15672 rabbitmq:4.0-management
+```
+
+and add this dependency
+
+```xml
+      <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-bus-amqp</artifactId>
+        </dependency>
+```
+
+for accounts, loans, cards and configserver.
+
+call api
+
+![img_28.png](img_28.png)
+
+My spring cloud bus since it detected a change happened on the config server version.
+It will communicate the same to all the microservices instances that are registered with the rabbitmq.
+Since the loans and cards microservices are already registered with the rabbitmq, the change might have communicated to them and they might have refreshed the properties without the restart of the application and without invoking these bus refresh or refresh endpoints.
+
+*Summary step to refresh configurations at runtime using Spring Cloud Bus*
+1. Add actuator dependency in the Config server & Client server. Add Spring Boot Actuator dependency in pom.xml of the individual microservices like accounts, loans, and cards to expose the /busrefresh
+2. Enable /busrefresh API: The Spring Boot Actuator library provides a configuration endpoint called "/actuator/busrefresh" that can trigger a refresh event. By default, this endpoint is not exposed, so you need to explicitly enable it in the application.yml file using below config:
+   - management:
+      endpoints:
+        web:
+          exposure:
+            include: "busrefresh"
+   - ![img_29.png](img_29.png)
+3. Add Spring Cloud Bus dependency in Config Server & Client Server. Add Spring Cloud Bus dependency (spring-cloud-starter-bus-amqp) inside pom.xml of the individual microservices like accounts, loans, cards and Configserver.
+4. Set up a RabbitMQ: Using Docker, setup RabbitMQ service. By default, Spring Boot smart enough to connect to the RabbitMQ service without explicitly specifying the default configuration. If the service is not started with default values, then configure the rabbitmq connection details in the application.yml file of all the individual microservices and configserver.
+5. Call one API like this:
+  ```text
+    http://localhost:8080/actuator/busrefresh
+  ```
+
+*Flow*
+![img_30.png](img_30.png)

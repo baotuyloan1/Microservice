@@ -29,6 +29,12 @@ spring:
           # by mention this force-pull as true, we are telling to override the local changes whenever we are trying to start or restart our config server.
           # this will make sure your config server always reading the properties from the master location which is GitHub repo.
           force-pull: true
+  rabbitmq:
+    host: "localhost"
+    port: 5672
+    stream:
+      username: "guest"
+      password: "guest"
 
 encrypt:
   key: "ehFnyvCwtrvRKR1Hwr0CDvUsIxZo6IbY"
