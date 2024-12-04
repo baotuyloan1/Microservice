@@ -455,11 +455,50 @@ Since the loans and cards microservices are already registered with the rabbitmq
             include: "busrefresh"
    - ![img_29.png](img_29.png)
 3. Add Spring Cloud Bus dependency in Config Server & Client Server. Add Spring Cloud Bus dependency (spring-cloud-starter-bus-amqp) inside pom.xml of the individual microservices like accounts, loans, cards and Configserver.
-4. Set up a RabbitMQ: Using Docker, setup RabbitMQ service. By default, Spring Boot smart enough to connect to the RabbitMQ service without explicitly specifying the default configuration. If the service is not started with default values, then configure the rabbitmq connection details in the application.yml file of all the individual microservices and configserver.
+4. Set up a RabbitMQ: Using Docker, setup RabbitMQ service. By default, Spring Boot smart enough to connect to the RabbitMQ service without explicitly specifying the default configuration. If the service is not started with default values, then configure the rabbitmq connection details in the application.yml file of all the individual microservices and config server.
+
+```text
+docker run -it --rm --name rabbitmq -p 5672:5672 -p 15672:15672 rabbitmq:4.0-management
+```
+
 5. Call one API like this:
   ```text
     http://localhost:8080/actuator/busrefresh
   ```
 
-*Flow*
+*Flow refresh configurations at runtime using Spring Cloud Bus*
 ![img_30.png](img_30.png)
+
+
+*Refresh config at runtime using Spring Cloud Bus & Spring Cloud Config monitor **
+![img_31.png](img_31.png)
+Webhook will call the URL when repository have some changes.
+By default, we can input an url in this field. But GitHub can't understand what is localhost ??
+So we need to overcome this challenge by using https://console.hookdeck.com/
+
+run this command on powershell:
+
+Step 1
+
+Install the Hookdeck CLI on your device
+```command
+scoop bucket add hookdeck https://github.com/hookdeck/scoop-hookdeck-cli.git
+
+scoop install hookdeck
+```
+
+Step 2
+
+Login and start the CLI with those commands
+
+```command
+
+hookdeck login --cli-key 0avuzv95itminivqaoezj89o30peb43nd6sosecbig1qpqaw2h
+
+hookdeck listen 8071 source --cli-path /monitor
+
+```
+![img_32.png](img_32.png)
+
+Webhook URL which has some domain name and this url perfectly match inside GitHub repository. 
+Whenever a webhook request receives from the GitHub repo to this webhook URL, it is going to redirect that into my local system, which is at the path monitor.
