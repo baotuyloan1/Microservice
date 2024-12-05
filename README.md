@@ -421,10 +421,7 @@ call api refresh will refresh the configurations after call the api instead of r
 
 Spring Cloud Bus links nodes of a distributed system with a lightweight message broker like RabbitMQ or Kafka.
 
-to install RabbitMQ use this command
-```text
-docker run -it --rm --name rabbitmq -p 5672:5672 -p 15672:15672 rabbitmq:4.0-management
-```
+
 
 and add this dependency
 
@@ -476,9 +473,9 @@ Webhook will call the URL when repository have some changes.
 By default, we can input an url in this field. But GitHub can't understand what is localhost ??
 So we need to overcome this challenge by using https://console.hookdeck.com/
 
-run this command on powershell:
 
-Step 1
+run this command on powershell:
+requirements:
 
 Install the Hookdeck CLI on your device
 ```command
@@ -486,19 +483,87 @@ scoop bucket add hookdeck https://github.com/hookdeck/scoop-hookdeck-cli.git
 
 scoop install hookdeck
 ```
+**HOW TO REFRESH CONFIGURATIONS AT RUNTIME USING SPRING CLOUD BUS & SPRING CLOUD CONFIG MONITOR**
+
+Step 1
+
+Add actuator dependency in the Config Server & Client services:
+```xml
+	<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-actuator</artifactId>
+		</dependency>
+```
 
 Step 2
 
+Enable /busrefresh API:
+```yaml
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "busrefresh"
+```
+
+Step 3
+
+Add Spring Cloud Bus dependency in Config Server & Client Server:
+```xml
+	<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-bus-amqp</artifactId>
+		</dependency>
+```
+
+Step 4
+
+Add Spring Cloud CConfig monitor dependency in Config Server
+```xml
+<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-config-monitor</artifactId>
+		</dependency>
+```
+
+Step 5
+
+Set up a RabbitMQ:
+```text
+docker run -it --rm --name rabbitmq -p 5672:5672 -p 15672:15672 rabbitmq:4.0-management
+```
+
 Login and start the CLI with those commands
+
+Step 6
+
+Set up a Webhooks in Github:
+
+![img_35.png](img_35.png)
+
+Step 7
+
+Set up hookdeck (only for local)
+
+*Config Hookdeck like this*
+*https://dashboard.hookdeck.com/connections*
+![img_33.png](img_33.png)
+![img_34.png](img_34.png)
+
 
 ```command
 
-hookdeck login --cli-key 0avuzv95itminivqaoezj89o30peb43nd6sosecbig1qpqaw2h
+hookdeck login
 
 hookdeck listen 8071 source --cli-path /monitor
+
 
 ```
 ![img_32.png](img_32.png)
 
 Webhook URL which has some domain name and this url perfectly match inside GitHub repository. 
 Whenever a webhook request receives from the GitHub repo to this webhook URL, it is going to redirect that into my local system, which is at the path monitor.
+
+
+
+![img_36.png](img_36.png)
