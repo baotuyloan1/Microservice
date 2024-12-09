@@ -40,8 +40,21 @@ encrypt:
   key: "ehFnyvCwtrvRKR1Hwr0CDvUsIxZo6IbY"
 server:
   port: 8071
+
+#  spring actuator
 management:
   endpoints:
     web:
       exposure:
         include: "*"
+#    for liveness and readiness probes
+  health:
+    readiness-state:
+      enabled: true
+    liveness-state:
+      enabled: true
+#      enable endpoint for readiness and liveness
+  endpoint:
+    health:
+      probes:
+        enabled: true
