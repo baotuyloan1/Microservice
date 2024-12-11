@@ -22,7 +22,7 @@ It is going to start my web application
 
 **BUILD A DOCKER IMAGE**
 ```text
-docker build . -t baotuyloan1/accounts:241114
+docker build . -t baotuyloan1/accounts:241210
 ```
 
 ![img_3.png](img_3.png)
