@@ -599,3 +599,21 @@ These indicators are shown on the global health endpoint ("/actuator/health"). T
 | **Dependent Service State**       | The dependent service can stop running after completing the task (exit code = 0). | The dependent service must maintain a "healthy" state.              | The dependent service only needs to start without requiring a "healthy" state. |
 | **Usage Example**                 | Run a one-time task such as configuration or data initialization.          | Services that need to maintain a "healthy" state, such as databases or APIs. | Services that need to be started, such as a web service or API.       |
 
+*Create MYSQL DB containers for microservices*
+
+```command
+docker run -p 3306:3306 --name accountsdb -e MYSQL_ROOT_PASSWORD=root -e MYSQL_DATABASE=accountsdb -d mysql
+
+docker run -p 3307:3306 --name loansdb -e MYSQL_ROOT_PASSWORD=root -e MYSQL_DATABASE=loansdb -d mysql
+
+docker run -p 3308:3306 --name cardsdb -e MYSQL_ROOT_PASSWORD=root -e MYSQL_DATABASE=cardsdb -d mysql
+```
+- d : detached mode
+- e : environment variable
+- msql: docker image name
+- name accountdb: container name
+
+To connect to this database, we need some client [sqlectron]. https://sqlectron.github.io/
+
+![img_37.png](img_37.png)
+

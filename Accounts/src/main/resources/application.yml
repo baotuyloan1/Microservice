@@ -6,17 +6,15 @@ spring:
   profiles:
     active: "prod"
   datasource:
-    url: jdbc:h2:mem:testdb
-    driver-class-name: org.h2.Driver
-    username: sa
-    password: ''
-  h2:
-    console:
-      enabled: true
+    url: jdbc:mysql://localhost:3306/accountsdb
+    username: root
+    password: root
+    driver-class-name: com.mysql.cj.jdbc.Driver
+# always try to execute the scripts that I have mentioned inside the schema.sql
+  sql:
+    init:
+      mode: always
   jpa:
-    database-platform: org.hibernate.dialect.H2Dialect
-    hibernate:
-      ddl-auto: update
     show-sql: true
   config:
 #    configserver prefix is an indication to account microservices or any other spring boot application that it is going to connect with the config server.

@@ -14,9 +14,35 @@ services:
     extends:
       file: common-config.yml
       service: network-deploy-service
-
+  accountsdb:
+    container_name: accountsdb
+    ports:
+      - 3306:3306
+    environment:
+      MYSQL_DATABASE: accountsdb
+    extends:
+      service: microservice-db-config
+      file: common-config.yml
+  loansdb:
+    container_name: loansdb
+    ports:
+      - 3307:3306
+    environment:
+      MYSQL_DATABASE: loansdb
+    extends:
+      service: microservice-db-config
+      file: common-config.yml
+  cardsdb:
+    container_name: cardsdb
+    ports:
+      - 3308:3306
+    environment:
+      MYSQL_DATABASE: cardsdb
+    extends:
+      service: microservice-db-config
+      file: common-config.yml
   configserver:
-    image: baotuyloan1/configserver:241210
+    image: baotuyloan1/configserver:241215
     #    if you don't provide container_name, a random name will given to your container by the Docker server
     container_name: configserver-ms
     ports:
@@ -25,15 +51,15 @@ services:
       rabbit:
         condition: service_healthy
     healthcheck:
-#      call api and check if the status is returned up ?, otherwise exit
+      #      call api and check if the status is returned up ?, otherwise exit
       test: "curl --fail --silent localhost:8071/actuator/health/readiness | grep UP || exit 1"
-#      do 10 times with an interval of 10s
+      #      do 10 times with an interval of 10s
       interval: 10s
-#      inside each check it has to wait for the maximum 5s to get the response from the URL.
+      #      inside each check it has to wait for the maximum 5s to get the response from the URL.
       timeout: 5s
-#      if there is a failure, do the retries for 10 times
+      #      if there is a failure, do the retries for 10 times
       retries: 10
-#      execute these healthy check command only after 10s
+      #      execute these healthy check command only after 10s
       start_period: 10s
     extends:
       file: common-config.yml
@@ -41,29 +67,37 @@ services:
 
 
   accounts:
-    image: baotuyloan1/accounts:241210
-#    if you don't provide container_name, a random name will given to your container by the Docker server
+    image: baotuyloan1/accounts:241215
+    #    if you don't provide container_name, a random name will given to your container by the Docker server
     container_name: accounts-ms
     ports:
       - "8080:8080"
     environment:
       SPRING_APPLICATION_NAME: "accounts"
+      SPRING_DATASOURCE_URL: jdbc:mysql://accountsdb:3306/accountsdb
     extends:
       file: common-config.yml
       service: microservice-configserver-config
+    depends_on:
+      accountsdb:
+        condition: service_healthy
   loans:
-    image: baotuyloan1/loans:241210
+    image: baotuyloan1/loans:241215
     #    if you don't provide container_name, a random name will given to your container by the Docker server
     container_name: loans-ms
     ports:
       - "8090:8090"
     environment:
       SPRING_APPLICATION_NAME: "loans"
+      SPRING_DATASOURCE_URL: jdbc:mysql://loansdb:3307/loansdb
     extends:
       file: common-config.yml
       service: microservice-configserver-config
+    depends_on:
+      loansdb:
+        condition: service_healthy
   cards:
-    image: baotuyloan1/cards:241210
+    image: baotuyloan1/cards:241215
     #    if you don't provide container_name, a random name will given to your container by the Docker server
     container_name: cards-ms
     ports:
@@ -73,6 +107,10 @@ services:
       service: microservice-configserver-config
     environment:
       SPRING_APPLICATION_NAME: "cards"
+      SPRING_DATASOURCE_URL: jdbc:mysql://cardsdb:3308/cardsdb
+    depends_on:
+      cardsdb:
+        condition: service_healthy
 # we create a network with the name easybank and the driver is bridge.
 # the reason why we need to create a network is because we want to make sure all our containers are able to communicate with each other.
 # we give the name easybank to the network so that we can use this network name.
