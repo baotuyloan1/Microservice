@@ -13,7 +13,7 @@ pipeline {
                 sh '''
                     ls -la
                     mvn -version
-                    mvn clean install
+                    mvn -f Accounts/pom.xml clean install
                 '''
             }
         }
