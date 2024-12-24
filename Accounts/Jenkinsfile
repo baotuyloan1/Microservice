@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     stages {
-        stage('Build') {
+        stage('Build Jar') {
             agent {
                 docker {
                     image 'maven:3.9.9-amazoncorretto-8-al2023'
@@ -13,10 +13,17 @@ pipeline {
                 sh '''
                     ls -la
                     mvn -version
-                     # get current day in yyMMdd
-                    TAG=$(date +'%y%m%d')
-                    echo "Building Docker image with tag: $TAG"
-                    docker build . -t baotuyloan1/accounts:$TAG
+                    mvn clean install
+                '''
+            }
+        }
+        stage('Build image') {
+            steps {
+                sh '''
+                 # get current day in yyMMdd
+                TAG=$(date +'%y%m%d')
+                echo "Building Docker image with tag: $TAG"
+                docker build . -t baotuyloan1/accounts:$TAG
                 '''
             }
         }
