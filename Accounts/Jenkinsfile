@@ -1,0 +1,21 @@
+pipeline {
+    agent any
+
+    stages {
+        stage('Build') {
+            agent {
+                docker {
+                    image 'maven:3.9.9-amazoncorretto-8-al2023'
+                    reuseNode true
+                }
+            }
+            steps {
+                sh '''
+                    ls -la
+                    mvn -version
+                    docker build . -t baotuyloan1/accounts:$(Get-Date -Format "yyMMdd")
+                '''
+            }
+        }
+    }
+}

@@ -22,7 +22,7 @@ It is going to start my web application
 
 **BUILD A DOCKER IMAGE**
 ```text
-docker build . -t baotuyloan1/accounts:241215
+docker build . -t baotuyloan1/accounts:$(Get-Date -Format "yyMMdd")
 ```
 
 ![img_3.png](img_3.png)
