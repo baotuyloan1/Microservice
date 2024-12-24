@@ -13,6 +13,9 @@ pipeline {
                 sh '''
                     ls -la
                     mvn -version
+                     # get current day in yyMMdd
+                    TAG=$(date +'%y%m%d')
+                    echo "Building Docker image with tag: $TAG"
                     docker build . -t baotuyloan1/accounts:$(Get-Date -Format "yyMMdd")
                 '''
             }
