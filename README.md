@@ -617,3 +617,18 @@ To connect to this database, we need some client [sqlectron]. https://sqlectron.
 
 ![img_37.png](img_37.png)
 
+# Microservices traffic
+- Deploy all microservices into a common microservice network.
+
+![img_39.png](img_39.png)
+
+- We need to maintain a single entry point, it will allow us to perform any checks related to security and auditing, logging.
+
+# Service Discovery & Registration in microservices.
+1. Service Discovery
+   - For cloud native applications, *service discovery* is the perfect solution. It involves tracking and storing information about all running service instances in a *service registry.*
+   - Whenever a new instance is created, it should be registered in the registry, and when it is terminated, it should be appropriately removed automatically.
+   - 
+2. Service Registration
+3. Load balancing
+
