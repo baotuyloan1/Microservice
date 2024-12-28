@@ -628,7 +628,41 @@ To connect to this database, we need some client [sqlectron]. https://sqlectron.
 1. Service Discovery
    - For cloud native applications, *service discovery* is the perfect solution. It involves tracking and storing information about all running service instances in a *service registry.*
    - Whenever a new instance is created, it should be registered in the registry, and when it is terminated, it should be appropriately removed automatically.
-   - 
+   
+   **a.** Client-side service discovery and load balancing:
+   - Client-side service discovery, applications are responsible for registering themselves with a service registry during startu and unregistering when shutting down. 
+   When an application needs to communicate with a backing service, it queries the service registry for the associated IP address. If multiple instances of the service are available, the registry returns a list of IP addresses.
+   The client application then selects one based on its own defined load-balancing strategy.
+   - ![img_40.png](img_40.png)
 2. Service Registration
 3. Load balancing
 
+# Client-side service discovery and load balancing
+Client-side service discovery is an architectural pattern where client applications are responsible for locating and connecting to services they depend on.
+In this approach, the client application communicates directly with a service registry to discover available service instances and obtain the necessary information to establish connections.
+
+Here are the key aspects of client-side service discovery:
+1. Service Registration: Client applications register themselves with the service registry upon startup. They provide essential information about their location, such as IP address, port, and metadata, which helps identify and categorize the service.
+2. Service Discovery: When a client application need to communicate with a specific service, it queries the service registry for available instances of that service.The registry responds with the necessary information, such as IP addresses and connection details.
+3. Load Balancing: Client-side service discovery often involves load balancing to distribute the workload across multiple service instances. The client application can implement a load-balancing strategy so select a specific instance based on factors like round-robin, weighted distribution, or latency.
+
+The major advantage of client-side service discovery is load balancing can be implemented using various algorithms, such as round-robin, weighted round-robin, lleast connections, or even custom algorithms.
+A drawback is that client service discovery assigns more responsibility to developers. Also, it results in one more service to deploy and maintain (the service registry).
+Server-side discovery solutions solve these issues.
+
+*The Spring Cloud project provides several alternatives for incorporating client-side service discovery in our Spring Boot based microservices*
+
+# How loadbalancing works in Client-side service discovery ?
+![img_41.png](img_41.png)
+![img_42.png](img_42.png)
+
+# Spring Cloud support for Client-side service discovery
+Spring Cloud porject makes Service Discovery & Registration setup trivial
+- Spring Cloud Netflix's Eureka service which will act as a service discovery agent.
+- Spring Cloud Load Balancer library for client-side loading balancing.
+- Nextflix Feign client to look up for a service b/w microservices.
+
+But apart from these components, we also have other projects inside the industry. For example, instead of Eureka, we can also use other products like Etcd, Consul and Apache Zookeeper.
+In some old projects or in some projects where they are using the older verions of Spring Boot you may see they are using Netflix Ribbon for client side load balancing.
+
+*Advantages of Sertvice Discovery approach includes *
