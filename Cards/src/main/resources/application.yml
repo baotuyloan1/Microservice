@@ -46,3 +46,34 @@ management:
       exposure:
         # spring boot actuator will enable and expose all management endpoint and inside these endpoints only we are also going to have refresh related endpoint.
         include: "*"
+  # enable the environment info related information is used for the Eureka dashboard
+  info:
+    env:
+      enabled: true
+  # enable an actuator URL which will allow me to shut down my accounts service gracefully.
+  endpoint:
+    shutdown:
+      enabled: true
+
+# expose shutdown api
+#endpoints:
+#  shutdown:
+#    enabled: true
+
+eureka:
+  instance:
+    # by default, it will try to register with the host name. The hostnames will make sense whenever you are trying to use DNS mappings inside your microservices.
+    # but inside our local system, we don't have any DNS mapping set up. We should use prefer IP address as true so my accounts microservice will register with my Eureka server by using the IP address.
+    preferIpAddress : true
+  client:
+    fetchRegistry: true
+    registerWithEureka: true
+    serviceUrl:
+      defaultZone: http://localhost:8070/eureka/
+
+# information that is going to be displayed inside the Eureka dashboard
+info:
+  app:
+    name: "cards"
+    description: "Easy Bank Cards Application"
+    version: "1.0.0"

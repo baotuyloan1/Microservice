@@ -665,4 +665,24 @@ Spring Cloud porject makes Service Discovery & Registration setup trivial
 But apart from these components, we also have other projects inside the industry. For example, instead of Eureka, we can also use other products like Etcd, Consul and Apache Zookeeper.
 In some old projects or in some projects where they are using the older verions of Spring Boot you may see they are using Netflix Ribbon for client side load balancing.
 
-*Advantages of Sertvice Discovery approach includes *
+# Steps to build Eureka Server
+1. Set up a new Spring Boot project. Include the *spring-cloud-starter-netflix-eureka-server* maven dependency.
+2. Configure the properties: In the application properties or YAML file, add the following configurations
+```yaml
+server:
+  port: 8070
+
+eureka:
+  instance:
+    hostname: localhost
+  client:
+    # Eureka server doesn't fetch the register details of other microservices
+    fetchRegistry: false
+    # No register Eureka server, and don't expose details into the registry of the service Discovery. Eureka server doesn't register with itself.
+    registerWithEureka: false
+    serviceUrl:
+      # Eureka will expose functionality and other microservices they can try to connect to register their details or to discover other service details.
+      defaultZone: http://${eureka.instance.hostname}:${server.port}/eureka/
+```
+3. Add the Eureka Server annotation: In the main class of your project, annotate it with @EnableEurekaServer. This annotation configures the application to act as a Eureka Server.
+4. Build and run the Eureka Server: Build your project and run it as a Spring Boot application. Open a web browser and navigate to http://localhost:8070.

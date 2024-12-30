@@ -1,6 +1,5 @@
 package com.example.microserviceaccounts.dto;
 
-
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotEmpty;
@@ -10,11 +9,10 @@ import lombok.Data;
 
 @Data
 @Schema(
-        name = "Customer",
-        description = "Schema to hold Customer and Account information"
+        name = "CustomerDetails",
+        description = "Schema to hold Customer, Account, Cards and Loans information"
 )
-public class CustomerDto {
-
+public class CustomerDetailsDto {
 
     @Schema(
             description = "Name of the Customer",
@@ -43,5 +41,16 @@ public class CustomerDto {
     @Schema(
             description = "Account details of the customer"
     )
-    private AccountDto accountDto;
+    private AccountDto accountsDto;
+
+    @Schema(
+            description = "Loans details of the customer"
+    )
+    private AccountDto loansDto;
+
+
+    @Schema(
+            description = "Cards details of the customer"
+    )
+    private AccountDto cardsDto;
 }
