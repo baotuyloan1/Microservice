@@ -42,7 +42,7 @@ services:
       service: microservice-db-config
       file: common-config.yml
   configserver:
-    image: baotuyloan1/configserver:241215
+    image: baotuyloan1/configserver:241231
     #    if you don't provide container_name, a random name will given to your container by the Docker server
     container_name: configserver-ms
     ports:
@@ -65,9 +65,36 @@ services:
       file: common-config.yml
       service: microservice-base-config
 
+  eurekaserver:
+    image: baotuyloan1/eurekaserver:241231
+    #    if you don't provide container_name, a random name will given to your container by the Docker server
+    container_name: eurekaserver-ms
+    ports:
+      - "8070:8070"
+    depends_on:
+      rabbit:
+        condition: service_healthy
+      configserver:
+        condition: service_healthy
+    healthcheck:
+      #      call api and check if the status is returned up ?, otherwise exit
+      test: "curl --fail --silent localhost:8070/actuator/health/readiness | grep UP || exit 1"
+      #      do 10 times with an interval of 10s
+      interval: 10s
+      #      inside each check it has to wait for the maximum 5s to get the response from the URL.
+      timeout: 5s
+      #      if there is a failure, do the retries for 10 times
+      retries: 10
+      #      execute these healthy check command only after 10s
+      start_period: 10s
+    extends:
+      file: common-config.yml
+      service: microservice-base-config
+    environment:
+      SPRING_APPLICATION_NAME: "eurekaserver"
 
   accounts:
-    image: baotuyloan1/accounts:241215
+    image: baotuyloan1/accounts:241231
 #    if you don't provide container_name, a random name will given to your container by the Docker server
     container_name: accounts-ms
     ports:
@@ -82,7 +109,7 @@ services:
       accountsdb:
         condition: service_healthy
   loans:
-    image: baotuyloan1/loans:241215
+    image: baotuyloan1/loans:241231
     #    if you don't provide container_name, a random name will given to your container by the Docker server
     container_name: loans-ms
     ports:
@@ -97,7 +124,7 @@ services:
       loansdb:
         condition: service_healthy
   cards:
-    image: baotuyloan1/cards:241216
+    image: baotuyloan1/cards:241231
     #    if you don't provide container_name, a random name will given to your container by the Docker server
     container_name: cards-ms
     ports:

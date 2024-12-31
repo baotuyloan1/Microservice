@@ -686,3 +686,41 @@ eureka:
 ```
 3. Add the Eureka Server annotation: In the main class of your project, annotate it with @EnableEurekaServer. This annotation configures the application to act as a Eureka Server.
 4. Build and run the Eureka Server: Build your project and run it as a Spring Boot application. Open a web browser and navigate to http://localhost:8070.
+
+
+# EUREKA SELF-PRESERVATION TO AVOID TRAPS IN NETWORK
+
+In a distributed system using Eureka, each service instance periodically sends a heartbeat signal to the Eureka server to indicate that it is still alive and functioning.
+If the Eureka server does not receiver a heartbeat from a service instance within a certain timeframe, it assumes that the instance has become unresponsive or has crashed.
+In normal scenarios, this behavior helps the Eureka server maintain an up-to-date view of t he registered service instances.
+
+However, in certain situations, network glitches or temporary system delays may cause the Eureka server to miss a few heartbeats, leading to false expiration of service instances.
+This can result in unnecessary evictions of healthy service instances from the registry, causing instability and disruption in the system.
+
+To mitigate this issue, Eureka enters into *Self-Preservation Mode*. When Self-Preservation mode is active, the existing registry entries will not be removed even if it stops receiving heartbeats from some the service instances.
+This prevents the Eureka server from evicting all the instances due to temporary network glitches or delays.
+
+In self-Preservation mode, the Eureka server continues to server the registered instances to client application, even if it suspects that some instances are no longer available. 
+This helps maintain the stability and availability of the service registry, ensuring that clients can still discover and interact with the available instances.
+
+Self-Preservation mode never expires, until and unless the down microservices are brought back or the network glitch is resolved. 
+This is because eureka will not expire the instances till it is above the threshold limit.
+
+*Eureka Server will not panic when it is not receiving heartbeats from the majority of the instances, instead it will be clam and enters into Self-preservation mode.
+This feature is a savior where the networks glitches are common and help us to handle false-positive alarms.*
+
+# Configurations which will directly or indirectly impact self-preservation behavior of eureka.
+
+1. Indicates the frequency the client sends heartbeats to server to indicate that it is still alive:
+   - ```eureka.instance.lease-renewal-interval-in-seconds = 30```
+2. Indicates the duration the server waits since it received the last heartbeat before it can evict an instance.
+   - ```eureka.instance.lease-expiration-duration-in-seconds = 90```
+3. A scheduler(EvictionTask) is run at this frequency which will evict instances from the registry if the lease of instances is expired as configured by lease-expiration-duration-in-seconds.
+It will also check whether the system has reached self-preservation mode (by comparing actual and expected heartbeats) before evicting.
+   - ```eureka.server.eviction-interval-timer-in-ms = 60 * 1000```
+4. This value is used to calculate the expected % of heartbeats per minute eureka expecting.
+   - ```eureka.server.renewal-percent-threshold = 0.85```
+5. A scheduler is run at this frequency which calculates the expected heartbeats per minute.
+   - ```eureka.server.renewal-threshold-update-interval-ms = 15 * 60 * 1000```
+6. By default self-preservation mode is enabled but if you need to disable it you can change it to 'false'.
+   - ```eureka.server.enable-self-preservation = true``` 
