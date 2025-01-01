@@ -47,9 +47,6 @@ services:
     container_name: configserver-ms
     ports:
       - "8071:8071"
-    depends_on:
-      rabbit:
-        condition: service_healthy
     healthcheck:
       #      call api and check if the status is returned up ?, otherwise exit
       test: "curl --fail --silent localhost:8071/actuator/health/readiness | grep UP || exit 1"
@@ -71,11 +68,6 @@ services:
     container_name: eurekaserver-ms
     ports:
       - "8070:8070"
-    depends_on:
-      rabbit:
-        condition: service_healthy
-      configserver:
-        condition: service_healthy
     healthcheck:
       #      call api and check if the status is returned up ?, otherwise exit
       test: "curl --fail --silent localhost:8070/actuator/health/readiness | grep UP || exit 1"
@@ -89,7 +81,7 @@ services:
       start_period: 10s
     extends:
       file: common-config.yml
-      service: microservice-base-config
+      service: microservice-configserver-config
     environment:
       SPRING_APPLICATION_NAME: "eurekaserver"
 
@@ -104,7 +96,7 @@ services:
       SPRING_DATASOURCE_URL: jdbc:mysql://accountsdb:3306/accountsdb
     extends:
       file: common-config.yml
-      service: microservice-configserver-config
+      service: microservice-eureka-config
     depends_on:
       accountsdb:
         condition: service_healthy
@@ -119,7 +111,7 @@ services:
       SPRING_DATASOURCE_URL: jdbc:mysql://loansdb:3306/loansdb
     extends:
       file: common-config.yml
-      service: microservice-configserver-config
+      service: microservice-eureka-config
     depends_on:
       loansdb:
         condition: service_healthy
@@ -131,7 +123,7 @@ services:
       - "9000:9000"
     extends:
       file: common-config.yml
-      service: microservice-configserver-config
+      service: microservice-eureka-config
     environment:
       SPRING_APPLICATION_NAME: "cards"
       SPRING_DATASOURCE_URL: jdbc:mysql://cardsdb:3306/cardsdb

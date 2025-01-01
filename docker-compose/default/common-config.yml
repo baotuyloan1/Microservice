@@ -18,11 +18,14 @@ services:
   microservice-base-config:
     extends:
       service: network-deploy-service
+    depends_on:
+      rabbit:
+        condition: service_healthy
     deploy:
       resources:
         limits:
-          # I just want to allocate maximum 700M of memory
-          memory: 700M
+          # I just want to allocate maximum 700M of memory -> 1G of memory | Fixing the error: Terminating due to java.lang.OutOfMemoryError: Java heap space
+          memory: 1G
     environment:
       SPRING_RABBITMQ_HOST: "rabbit"
 
@@ -32,11 +35,17 @@ services:
     depends_on:
       configserver:
         condition: service_healthy
-      eurekaserver:
-        condition: service_healthy
     environment:
       SPRING_PROFILES_ACTIVE: default
       SPRING_CONFIG_IMPORT: "optional:configserver:http://configserver:8071/"
+
+  microservice-eureka-config:
+    extends:
+      service: microservice-configserver-config
+    depends_on:
+      eurekaserver:
+        condition: service_healthy
+    environment:
       SPRING_DATASOURCE_USERNAME: root
       SPRING_DATASOURCE_PASSWORD: root
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eurekaserver:8070/eureka
