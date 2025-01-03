@@ -77,3 +77,10 @@ info:
     name: "Loans"
     description: "Easy Bank Loans Application"
     version: "1.0.0"
+
+
+logging:
+  level:
+    com:
+      microservice:
+        loans: DEBUG

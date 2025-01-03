@@ -1,0 +1,64 @@
+spring:
+  application:
+    name: "gatewayserver"
+  config:
+    import: "optional:configserver:http://localhost:8071/"
+  cloud:
+#    connect with the discovery server which is Eureka server
+    gateway:
+      discovery:
+#        locate all the details about the microservices.
+        locator:
+#          if it is true, the default URL that the external client calls will be like this http://localhost:8072/accounts/api/...
+#          if it is false, the default URL will be disabled. (when we use custom URL, the default URL should be disabled. [RouteLocator easyBankRouteConfig])
+          enabled: false
+          serviceId: "cards"
+          # Accept the service name with the completely lowercase. (when call API, the service name will be in lowercase)
+          lower-case-service-id: true
+
+  #build:
+  #  version: "3.0"
+  #
+  #cards:
+  #  message: "Welcome to EasyBank cards related local APIs"
+  #  contactDetails:
+  #    name" : "Bao Nguyen"
+  #    email: "nguyenducbaokey@gmail.com"
+  #  onCallSupport:
+  #    - (+84) 788 049 042
+  #    - (+84) 123 456 789
+  rabbitmq:
+    host: "localhost"
+    port: 5672
+    stream:
+      username: "guest"
+      password: "guest"
+
+management:
+  endpoints:
+    web:
+      exposure:
+        # spring boot actuator will enable and expose all management endpoint and inside these endpoints only we are also going to have refresh related endpoint.
+        include: "*"
+  # enable the environment info related information is used for the Eureka dashboard
+  info:
+    env:
+      enabled: true
+  endpoint:
+    gateway:
+      enabled: true
+
+
+
+# information that is going to be displayed inside the Eureka dashboard
+info:
+  app:
+    name: "gatewayserver"
+    description: "Easy Bank Gateway Server Application"
+    version: "1.0.0"
+
+logging:
+  level:
+    com:
+      baond:
+        gatewayserver: DEBUG

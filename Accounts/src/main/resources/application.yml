@@ -74,7 +74,7 @@ eureka:
     fetchRegistry: true
     registerWithEureka: true
     serviceUrl:
-      defaultZone: http://localhost:8070/eureka/
+      defaultZone: "http://localhost:8070/eureka/"
 
 # information that is going to be displayed inside the Eureka dashboard
 info:
@@ -82,3 +82,10 @@ info:
     name: "accounts"
     description: "Easy Bank Accounts Application"
     version: "1.0.0"
+
+
+logging:
+  level:
+    com:
+      example:
+        microserviceaccounts: DEBUG

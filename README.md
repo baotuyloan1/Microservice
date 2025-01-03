@@ -717,10 +717,158 @@ This feature is a savior where the networks glitches are common and help us to h
    - ```eureka.instance.lease-expiration-duration-in-seconds = 90```
 3. A scheduler(EvictionTask) is run at this frequency which will evict instances from the registry if the lease of instances is expired as configured by lease-expiration-duration-in-seconds.
 It will also check whether the system has reached self-preservation mode (by comparing actual and expected heartbeats) before evicting.
-   - ```eureka.server.eviction-interval-timer-in-ms = 60 * 1000```
+   - ```eureka.server.eviction-inter val-timer-in-ms = 60 * 1000```
 4. This value is used to calculate the expected % of heartbeats per minute eureka expecting.
    - ```eureka.server.renewal-percent-threshold = 0.85```
 5. A scheduler is run at this frequency which calculates the expected heartbeats per minute.
    - ```eureka.server.renewal-threshold-update-interval-ms = 15 * 60 * 1000```
 6. By default self-preservation mode is enabled but if you need to disable it you can change it to 'false'.
    - ```eureka.server.enable-self-preservation = true``` 
+
+# ROUTING, CROSS CUTTING CONCERNS IN MICROSERVICES.
+ 
+In a scenario where multiple clients directly connect with various services, several challenges arise.
+For instance, clients must be aware of the URLs of all the services, and enforcing common requirements such as security, auditing, logging, and routing becomes a repetitive task across all services.
+To address these challenges, it becomes necessary to establish a signle gateway as the entrypoint to the microservices network.
+
+![img_44.png](img_44.png)
+
+Edge servers are applications positioned at edge of a system, responsible for implementing functionalities such as API gateways, handling cross-cutting concerns.
+By using edge servers, it becomes possible to prevent cascading failures when invoking downstream services, allowing for the specification of reties and timeouts for all internal service calls.
+Additionally, these servers enable control over ingress traffic, empowering the enforcement of quota policies.
+Furthermore, authentication and authorization mechanisms can be implemented at the edge, enabling the passing of tokens to downstream services for secure communication and access control.
+
+### Few important tasks that API gateways does
+
+![img_45.png](img_45.png)
+
+There is no mandatory that you need to implement all these components inside your API gateway.
+This is not the full exhaustive list on what the API gateway is capable of.
+Apart from these regular positive scenarios, we can also handle negative scenarios like implementing the exception handling, circuit breaker to make our microservices fault-tolerant and resilient.
+Apart from these positive and negative scenarios, your API gateway is also capable of sending all the logging and monitoring related information to a tools like Grafana.
+If needed, we can also integrate our API gateway with a Redis cache, which means you can write some business logic by leveraging the cache that you can store inside this Redis component. 
+
+# Spring Cloud Gateway
+
+Spring Cloud Gateway streamlines the creation of edge services by emphasizing ease and efficiency.
+Moreover, due to its utilization of a reactive framework, it can seamlessly expand to handle significant workload that typically arises in the system's edge while maintaining optimal scalability.
+
+### The key aspects of Spring Cloud Gateway:
+
+- The service gateway sits as the gatekeeper for all inbound traffic to microservice calls within the application. 
+With a service gateway in place, the service clients never directly call the URL of an individual service, but instead place all calls to the service gateway.
+- Spring Cloud Gateway is a library for building an API gateway, so it looks like any another Spring Boot application. If you're a Spring developer, you'll find it's easy to get started with Spring Cloud Gateway with just a few lines of code.
+- Spring Cloud Gate is intended to sit between a requester and a resource that's being requested, where it intercepts, analyzes, and modifies every request. 
+That means you can route requests based on their context. Did a request include a header indicating an API version? We can route that request to the appropriately versioned backend.
+Does the request require sticky sessions? The gateway can keep track of each user's session.
+
+Spring Cloud Gateway is the preferred API gateway compared to zuul. Because Spring Cloud Gateway built on Spring Reactor & Spring WebFlux, provides a circuit breaker integration, service discovery with Eureka, non-blocking in nature, has a superior performance compared to that of Zuul.
+
+*The service gateway sits between all calls from the client to the individual services & acts as a central Policy Enforcement Point (PEP) like below*
+- Routing (Both Static and Dynamic)
+- Security (Authentication & Authorization)
+- Logging, Auditing and Metrics collection
+
+# Spring Cloud Gateway Internal Architecture
+
+![img_46.png](img_46.png)
+
+A predicate is a logic that will return a boolean value. You can define some conditions to your spring cloud gateway, saying that if a particular condition is met, then only forward the request to the microservices.
+
+Pre-Filters configured by developers. Inside these Pre-Filter we can execute any business logic like you can do some request validations, you can do some auditing, logging, you can modify the request, you can perform some security checks.
+
+Pass the predicate → pass the Pre-Filters → This request will be forwarded to the actual microservice.
+
+Once my microservice processes the request, it is going to send the response and the response will be intercepted by the post-filters.
+
+# Steps to create Spring Cloud Gateway
+
+1. Set up a new Spring Boot project. Include the *spring-cloud-starter-gateway*, *spring-cloud-starter-config*, *spring-cloud-starter-nextflix-eureka-client* maven dependencies.
+2. Configure the properties: in the application properties or YAML file, add the following configurations
+    ```yaml
+    eureka:
+      instance:
+        prefer-ip-address: true
+        instance-id: ${spring.application.name}:${spring.application.instance_id:${random.value}}
+      client:
+        registerWithEureka: true
+        fetchRegistry: true
+        serviceUrl:
+          defaultZone: http://localhost:8070/eureka/
+    
+    spring:
+      cloud:
+        gateway:
+          discovery:
+            locator:
+              enabled: true
+              lowerCaseServiceId: true
+    ```
+3. Configure the routing config: Make routing configurations using RouteLocatorBuilder like shown below:
+    ```java
+    @Bean
+    public RouteLocator easyBankRouteConfig(RouteLocatorBuilder routeLocatorBuilder){
+      return routeLocatorBuilder.routes()
+              .route(p -> p
+    //						 predicate - path predicate.
+                      .path("/easybank/accounts/**")
+    //						pre-defined filter
+                      .filters(f -> f.rewritePath("/easybank/accounts/(?<remaining>.*)", "/${remaining}")
+                              .addResponseHeader("X-Response-Time", LocalDateTime.now().toString()))
+    //						forward the request to the actual microservice.
+                      .uri("lb://ACCOUNTS"))
+              .route(p -> p
+                      .path("/easybank/cards/**")
+                      .filters(f -> f.rewritePath("/easybank/cards/(?<remaining>.*)", "/${remaining}")
+                              .addResponseHeader("X-Response-Time", LocalDateTime.now().toString()))
+                      .uri("lb://CARDS"))
+              .route(p -> p
+                      .path("/easybank/loans/**")
+                      .filters(f -> f.rewritePath("/easybank/loans/(?<remaining>.*)", "/${remaining}")
+                              .addResponseHeader("X-Response-Time", LocalDateTime.now().toString()))
+                      .uri("lb://LOANS"))
+              .build();
+    }
+    ```
+4. Build and Run the application
+
+## API Gateway Pattern
+
+Actural part in microservices design, offering a unified entry point for multiple microservices. It acts as a gateway between the external clients (e.g., web apps, mobile apps) and the internal microservices, helping streamline communication, security and routing.
+This pattern is essential when managing the complexities of microservice-based applications.
+
+![img_47.png](img_47.png)
+
+## Gateway Routing pattern
+
+The Gateway Routing pattern is a design pattern used in microservices architectures where an API Gateway routes incoming client requests to the appropriate backend microservices based on various factors like URL, headers or request parameters.
+
+## Gateway offloading Pattern
+
+The Gateway Offloading Pattern is an architectural pattern used in microservices to offload certain cross-cutting concerns-such as security, caching, rate limiting and monitoring from individual microservices to the API Gateway.
+This pattern helps centralize and simplify the implementation of these concerns, allowing the microservices to focus solely on business logic.
+
+![img_48.png](img_48.png)
+
+The Edge server is offloading the cross-cutting concerns from the individual microservices.
+
+We can't offload the business logic of accounts to the gateway because it will defeat the whole purpose of microservices.
+Only the cross-cutting-concerns will be offloading.
+
+## Backend for Frontend (BFF) Pattern
+
+![img_50.png](img_50.png)
+
+The Backend for Frontend (BFF) Pattern is a design pattern used in microservices architectures where a separate backend service is created for each client (e.g., web, mobile, tablet). Each frontend(client) has its own specialized backend to optimize communication between the frontend and the microservices, providing a tailored experience for different clients.
+
+Example:
+- The Web has a lot of space for displaying content, so the response for web will be details.
+- The Mobile and Tablet have a smaller space for displaying content, so the response for mobile will be summary.
+
+## Gateway Aggregator/Composition pattern
+
+![img_51.png](img_51.png)
+
+In microservices architecture, a Gateway Aggregator or Gateway Composition pattern is used when a request from a client needs to retrieve or process data from multiple backend microservices. 
+Instead of having the client make multiple calls to various microservices, the API Gateway consolidates the requests into a single response.
+
