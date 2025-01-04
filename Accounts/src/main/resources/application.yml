@@ -55,10 +55,18 @@ management:
   info:
     env:
       enabled: true
+  health:
+    readiness-state:
+      enabled: true
+    liveness-state:
+      enabled: true
   # enable an actuator URL which will allow me to shut down my accounts service gracefully.
   endpoint:
     shutdown:
       enabled: true
+    health:
+      probes:
+        enabled: true
 
 # expose shutdown api
 #endpoints:

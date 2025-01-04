@@ -109,7 +109,7 @@
 				<artifactId>spring-boot-maven-plugin</artifactId>
 				<configuration>
 					<image>
-						<name>baotuyloan1/${project.artifactId}:241231</name>
+						<name>baotuyloan1/${project.artifactId}:250104</name>
 					</image>
 					<excludes>
 						<exclude>
@@ -117,6 +117,15 @@
 							<artifactId>lombok</artifactId>
 						</exclude>
 					</excludes>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+				<configuration>
+					<image>
+						<runImage>buildpack-deps:jammy-curl</runImage>
+					</image>
 				</configuration>
 			</plugin>
 		</plugins>
