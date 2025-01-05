@@ -872,3 +872,117 @@ Example:
 In microservices architecture, a Gateway Aggregator or Gateway Composition pattern is used when a request from a client needs to retrieve or process data from multiple backend microservices. 
 Instead of having the client make multiple calls to various microservices, the API Gateway consolidates the requests into a single response.
 
+# RESILIENCY IN MICROSERVICES
+
+1. How do we avoid cascading failures?
+   - One failed or slow service should not have a ripple effect on the other microservices. Like in the scenarios of multiple microservices are communicating, we need to make sure that the entire chain of microservices doesn't fail with the failure of a single microservice.
+2. How do we handle failures gracefully with fallbacks?
+   - In a chain of multiple microservices, how do we build a fallback mechanism if one of the microservices is not working. Like returning a default value or return values from cache or call another service/DB to fetch the results etc.
+3. How to make our services self-healing capable?
+   - In the case of slow performing services, how do we we configure timeouts, retries and give time for a failed services to recover itself.
+
+*Solution:*
+- Long back inside the Java ecosystem, we used to have a library called Hystrix. This is a library developed by Netflix team itself.
+It used to be widely used for implementing resiliency patterns inside any web application or inside microservices. 
+However, Hystrix entered maintenance mode in 2018 and is no longer beging actively developed.
+
+
+- To address this, Resilience4J provides a lot of resilient related patterns which we can choose to base upon our requirements.
+  - There are the patterns with the name like :
+    - circuit breaker: used to stop making requests when a service invoked is falling.
+    - fallback: alternative paths to failing requests
+    - retry: used to make retries when a service has temporarily failed.
+    - rate limit: Limits the number of calls that a service receives in a time.
+    - bulkhead: limits the number of outgoing concurrent requests to a service to avoid overloading.
+
+# CIRCUIT BREAKER PATTERN
+![img_52.png](img_52.png)
+
+When a microservice responds slowly or fails to function, it can lead to the depletion of resource threads on the Edge server and intermediate services.
+This has a negative impact on the overall performance of the microservice network.
+→ To handle this kind of scenario, we can use the Circuit Breaker pattern.
+
+The advantages with circuit breaker pattern are:
+- Fail fast
+- Fail gracefully
+- Recover seamlessly.
+
+![img_53.png](img_53.png)
+
+
+Whenever we activate the circuit breaker pattern on any microservice, it is going to control the flow of traffic towards the microservice by using three different states.
+- Closed: Initially, when the application starts by default, your circuit breaker will be in this closed state.
+Inside this closed status, it is going to accept all the requests coming towards your particular microservice.
+- Open: If the Circuit breaker sees a threshold requests are failing, then it will OPEN the circuit which will make requests fail fast.
+- Half open: After wait duration (depending on the circuit breaker configuration) the open circuit will be half-opened. Periodically the Circuit breaker checks if the issue is resolved by allowing few requests. 
+Based on the results, it will either go to CLOSED or OPEN status. Failure rate above a threshold goes to OPEN. The Failure rate below the threshold goes to CLOSED.
+
+*Some URL*: 
+- See analytics about all the circuit breakers: http://192.168.149.1:8072/actuator/circuitbreakers
+  - ```json
+    {
+      "circuitBreakers": {
+        "accountsCircuitBreaker": {
+        "failureRate": "-1.0%",
+        "slowCallRate": "-1.0%",
+        "failureRateThreshold": "50.0%",
+        "slowCallRateThreshold": "100.0%",
+        "bufferedCalls": 3,
+        "failedCalls": 0,
+        "slowCalls": 0,
+        "slowFailedCalls": 0,
+        "notPermittedCalls": 0,
+        "state": "CLOSED"
+        }
+      }
+    }
+    ``` 
+    - bufferedCalls: the number of calls to the perspective circuit breaker.
+
+- See logs about the respective circuit breaker: http://localhost:8072/actuator/circuitbreakerevents?name=accountsCircuitBreaker
+
+### *NOTE* :
+The steps to build a circuit breaker pattern using Spring Cloud Gateway Filter:
+
+1. Add maven dependency: add spring-cloud-starter-circuitbreaker-reactor-resilience4j maven dependency inside pom.xml.
+2. Add circuit breaker filter: Inside the method where we are creating a bean of RouteLocator, add a filter of circuit breaker like below and create a REST API handling the fallback uri /contactSupport
+   ```java
+       @Bean
+           public RouteLocator easyBankRouteConfig(RouteLocatorBuilder routeLocatorBuilder) {
+           return routeLocatorBuilder.routes()
+                   .route(p -> p
+       //						 predicate - path predicate.
+                           .path("/easybank/accounts/**")
+       //						pre-defined filter
+                           .filters(f -> f.rewritePath("/easybank/accounts/(?<remaining>.*)", "/${remaining}")
+                                   .addResponseHeader("X-Response-Time", LocalDateTime.now().toString())
+                                   .circuitBreaker(config -> config.setName("accountsCircuitBreaker")
+       //										Whenever there is an exception happens, please invoke this fallback by forwarding the request to the contact support.
+                                           .setFallbackUri("forward:/contactSupport")))
+       //						forward the request to the actual microservice.
+                           .uri("lb://ACCOUNTS")).build();
+       }
+       
+        @RequestMapping("/contactSupport")
+        public Mono<String> contactSupport(){
+            return Mono.just("An error occurred. Please try after some time or contact support team!!!");
+        }
+    ```
+
+3. Add properties:
+  ```yaml
+  resilience4j.circuitbreaker:
+    configs:
+      #    By using the default, that means these properties are applicable to all kinds of circuit breakers that you are going to create inside the microservices.
+      #    replace the CircuitBreaker name which is defined the circuitBreaker ... setName("accountsCircuitBreaker")
+      default:
+        #      how many requests it has to initially monitor before it tries to change the status from close to open. In other words, at least 10 requests coming towards the accounts microservice.
+        #      after monitoring 10 requests, you can take the decision whether to continue with the close status or to move to the open status.
+        slidingWindowSize: 10
+        #     The number of requests that are allowed in the half-open state. Based upon how these two requests are processed, it can decide whether to go back to the open state or move to the closed state.
+        permittedNumberOfCallsInHalfOpenState: 2
+        #      if at least 50% of my requests are failed, then my circuit breaker pattern can move to the open state from the close state
+        failureRateThreshold: 50
+        #      The circuit breaker pattern going to wait 10 seconds (block all requests) to the microservice and response immediately. After 10 seconds, it will try to move to the half-open state from the open state.
+        waitDurationInOpenState: 10000
+  ```

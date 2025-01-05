@@ -23,7 +23,10 @@ public class GatewayserverApplication {
 						.path("/easybank/accounts/**")
 //						pre-defined filter
 						.filters(f -> f.rewritePath("/easybank/accounts/(?<remaining>.*)", "/${remaining}")
-								.addResponseHeader("X-Response-Time", LocalDateTime.now().toString()))
+								.addResponseHeader("X-Response-Time", LocalDateTime.now().toString())
+								.circuitBreaker(config -> config.setName("accountsCircuitBreaker")
+//										Whenever there is an exception happens, please invoke this fallback by forwarding the request to the contact support.
+										.setFallbackUri("forward:/contactSupport")))
 //						forward the request to the actual microservice.
 						.uri("lb://ACCOUNTS"))
 				.route(p -> p

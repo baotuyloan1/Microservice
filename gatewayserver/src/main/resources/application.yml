@@ -62,3 +62,18 @@ logging:
     com:
       baond:
         gatewayserver: DEBUG
+
+resilience4j.circuitbreaker:
+  configs:
+#    By using the default, that means these properties are applicable to all kinds of circuit breakers that you are going to create inside the microservices.
+#    replace the CircuitBreaker name which is defined the circuitBreaker ... setName("accountsCircuitBreaker")
+    default:
+#      how many requests it has to initially monitor before it tries to change the status from close to open. In other words, at least 10 requests coming towards the accounts microservice.
+#      after monitoring 10 requests, you can take the decision whether to continue with the close status or to move to the open status.
+      slidingWindowSize: 10
+#     The number of requests that are allowed in the half-open state. Based upon how these two requests are processed, it can decide whether to go back to the open state or move to the closed state.
+      permittedNumberOfCallsInHalfOpenState: 2
+#      if at least 50% of my requests are failed, then my circuit breaker pattern can move to the open state from the close state
+      failureRateThreshold: 50
+#      The circuit breaker pattern going to wait 10 seconds (block all requests) to the microservice and response immediately. After 10 seconds, it will try to move to the half-open state from the open state.
+      waitDurationInOpenState: 10000
