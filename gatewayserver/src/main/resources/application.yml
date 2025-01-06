@@ -68,12 +68,12 @@ logging:
 
 
 resilience4j:
-  timelimiter:
-    configs:
-#      use this configuration if we already defined circuit breaker in GatewayServerApplication, and the configuration httpclient.response-timeout will be ignored.
-      accountsCircuitBreaker:
-        timeout-duration: 5s
-        cancel-running-future: false
+#  timelimiter:
+#    configs:
+##      use this configuration if we already defined circuit breaker in GatewayServerApplication, and the configuration httpclient.response-timeout will be ignored.
+#      accountsCircuitBreaker:
+#        timeout-duration: 5s
+#        cancel-running-future: false
   circuitbreaker:
     configs:
       #    By using the default, that means these properties are applicable to all kinds of circuit breakers that you are going to create inside the microservices.

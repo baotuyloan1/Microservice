@@ -111,4 +111,20 @@ resilience4j:
         sliding-window-size: 10
         permitted-number-of-calls-in-half-open-state: 2
         failure-rate-threshold: 50
-        wait-duration-in-open-state: 20000
+        wait-duration-in-open-state: 10000
+  retry:
+    configs:
+      default:
+#        try to retry 3 times before go to the callback method.
+        max-attempts: 3
+        wait-duration: 1000
+        enable-exponential-backoff: true
+#       backoff factor
+        exponential-backoff-multiplier: 2
+#        don't retry the request, it throws the below exceptions.
+#        but it still runs the callback method.
+#        ignore-exceptions:
+#          - java.lang.NullPointerException
+#        the retry will happen only for these kinds of exceptions, all the remaining exceptions will be ignored by the resilience4j. Don't have to mention ignore-exceptions above.
+        retry-exceptions:
+          - java.util.concurrent.TimeoutException

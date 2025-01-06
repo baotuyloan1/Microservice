@@ -6,6 +6,7 @@ import com.example.microserviceaccounts.dto.CustomerDto;
 import com.example.microserviceaccounts.dto.ErrorResponseDto;
 import com.example.microserviceaccounts.dto.ResponseDto;
 import com.example.microserviceaccounts.service.IAccountService;
+import io.github.resilience4j.retry.annotation.Retry;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -14,6 +15,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Pattern;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
@@ -21,6 +24,8 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.concurrent.TimeoutException;
 
 @RestController
 @RequestMapping(path = "/api", produces = {MediaType.APPLICATION_JSON_VALUE})
@@ -34,6 +39,8 @@ public class AccountsController {
     private final IAccountService iAccountService;
     private final Environment environment;
     private final AccountsContactInfoDto accountsContactInfoDto;
+
+    private static final Logger logger = LoggerFactory.getLogger(AccountsController.class);
 
     public AccountsController(IAccountService iAccountService, Environment environment, AccountsContactInfoDto accountsContactInfoDto) {
         this.iAccountService = iAccountService;
@@ -174,6 +181,7 @@ public class AccountsController {
         }
     }
 
+    @Retry(name = "getBuildInfo", fallbackMethod = "getBuildInfoFallback")
     @Operation(
             summary = "Get Build information REST API",
             description = "Get Build information that is deployed into accounts microservice"
@@ -196,10 +204,16 @@ public class AccountsController {
             )
     })
     @GetMapping("/build-info")
-    public ResponseEntity<String> getBuildInfo() {
+    public ResponseEntity<String> getBuildInfo() throws TimeoutException {
+        logger.debug("getBuildInfo() method called");
         return ResponseEntity.status(HttpStatus.OK).body(buildVersion);
     }
 
+//    this method will be called when already finished retry getBuildInfo.
+    public ResponseEntity<String>  getBuildInfoFallback(Throwable throwable){
+        logger.debug("getBuildInfoFallback() method called");
+        return ResponseEntity.status(HttpStatus.OK).body("0.9");
+    }
     @Operation(
             summary = "Get Java version",
             description = "Get Java versions details that is installed into accounts microservice"

@@ -1044,7 +1044,7 @@ the Circuit can be opened to prevent further attempts and preserve system resour
 - Idempotent Operations: Ensure that the retried operation is idempotent, meaning it produces the same result regardless of how may time it is invoked. 
 This prevents unintended side effects or duplicate operations. (API of type idempotent) 
 
-The steps to build a retry pattern using Spring Cloud Gateway Filter
+## The steps to build a retry pattern using Spring Cloud Gateway Filter
 
 1. Add Retry Filter: Inside the method where we are creating a bean of RouteLocator, add a filter of retry
 
@@ -1071,4 +1071,48 @@ public RouteLocator easyBankRouteConfig(RouteLocatorBuilder routeLocatorBuilder)
                     )
                     .uri("lb://ACCOUNTS")).build();
 }
+```
+
+## Retry pattern in a microservice:
+- We can config a fallback mechanism to a Retry pattern in a microservice, which can't be done in a gateway microservice. This is the limitation of Spring Cloud Gateway.
+- In Gateway, it considers the very initial request not under the retry attempts. However, in microservice, it considers the very initial request under the retry attempts.
+So when we config 3 retries in gateway, it will be four retries. With microservice, it will be three retries.
+
+Steps to build a retry pattern using normal Spring Boot serivce:
+
+1. Add Retry pattern annotation: Choose a method and mention retry pattern related annotation along with the below configs. Post that create a fallback method maching the same method signature.
+
+```java
+    @GetMapping("/build-info")
+    public ResponseEntity<String> getBuildInfo() throws TimeoutException {
+        logger.debug("getBuildInfo() method called");
+        return ResponseEntity.status(HttpStatus.OK).body(buildVersion);
+    }
+
+//    this method will be called when already finished retry getBuildInfo.
+    public ResponseEntity<String>  getBuildInfoFallback(Throwable throwable){
+        logger.debug("getBuildInfoFallback() method called");
+        return ResponseEntity.status(HttpStatus.OK).body("0.9");
+    }
+```
+
+2. Add properties: 
+```yaml
+resilience4j:
+  retry:
+    configs:
+      default:
+#        try to retry 3 times before go to the callback method.
+        max-attempts: 3
+        wait-duration: 1000
+        enable-exponential-backoff: true
+#       backoff factor
+        exponential-backoff-multiplier: 2
+#        don't retry the request, it throws the below exceptions.
+#        but it still runs the callback method.
+#        ignore-exceptions:
+#          - java.lang.NullPointerException
+#        the retry will happen only for these kinds of exceptions, all the remaining exceptions will be ignored by the resilience4j. Don't have to mention ignore-exceptions above.
+        retry-exceptions:
+          - java.util.concurrent.TimeoutException
 ```
