@@ -1030,3 +1030,45 @@ resilience4j.circuitbreaker:
       failureRateThreshold: 50
       waitDurationInOpenState: 10000
 ```
+
+# RETRY PATTERN
+
+The retry pattern will make configured multiple retry attempts when a service has temporarily failed. 
+This pattern is very helpful in the scanarios like network disruption where the client request may be successful after a retry attempt.
+
+- Retry Logic: Determine when and how many times to retry an operation. This can be based on factors such as error codes, exceptions, response status.
+- Backoff strategy: Define a strategy for delaying retries to avoid overwhelming the system or exacerbating the underlying issue.
+This strategy can involve gradually increasing the delay between each retry, known as exponential backoff.
+- Circuit Breaker Integration: Consider combining the Retry pattern with a Circuit Breaker pattern. If a certain number of retries fail consecutively,
+the Circuit can be opened to prevent further attempts and preserve system resources
+- Idempotent Operations: Ensure that the retried operation is idempotent, meaning it produces the same result regardless of how may time it is invoked. 
+This prevents unintended side effects or duplicate operations. (API of type idempotent) 
+
+The steps to build a retry pattern using Spring Cloud Gateway Filter
+
+1. Add Retry Filter: Inside the method where we are creating a bean of RouteLocator, add a filter of retry
+
+```java
+@Bean
+public RouteLocator easyBankRouteConfig(RouteLocatorBuilder routeLocatorBuilder) {
+    return routeLocatorBuilder.routes()
+            .route(p -> p
+//						 predicate - path predicate.
+                    .path("/easybank/loans/**")
+//						pre-defined filter
+                    .filters(f -> f.rewritePath("/easybank/loans/(?<remaining>.*)", "/${remaining}")
+                                    .addResponseHeader("X-Response-Time", LocalDateTime.now().toString())
+                                    .retry(retryConfig ->
+//									the number of retries
+                                                    retryConfig.setRetries(3)
+//											only retries for get operation, because won't be any side effects whenever we are trying to invoke the get operation multiple times.
+                                                            .setMethods(HttpMethod.GET)
+//											spring cloud gateway will wait for 100 milliseconds whenever it is trying to initiate the very first retry operation.
+//											based factor, but it will not be higher than 1000 milliseconds
+//											spring cloud gateway will apply the factor value on the previous backoff number to calculate the next backoff time but not higher than 1000 milliseconds
+                                                            .setBackoff(Duration.ofMillis(100), Duration.ofMillis(1000), 2, true)
+                                    )
+                    )
+                    .uri("lb://ACCOUNTS")).build();
+}
+```

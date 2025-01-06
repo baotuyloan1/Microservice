@@ -260,6 +260,7 @@ public class LoanController {
     })
     @GetMapping("/contact-info")
     public ResponseEntity<LoansContactInfoDto> getContactInfo() {
+        logger.debug("Invoked Loans contact-info API");
         // get path from system environments in your machine, it also get properties in your application.properties or application.yml
         return ResponseEntity.status(HttpStatus.OK).body(this.loansContactInfoDto);
     }

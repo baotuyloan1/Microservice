@@ -15,7 +15,10 @@ spring:
           serviceId: "cards"
           # Accept the service name with the completely lowercase. (when call API, the service name will be in lowercase)
           lower-case-service-id: true
-
+      httpclient:
+        # use this configuration if we don't use circuit breaker. This global configuration will be ignored and whatever configurations specific to circuit breaker will be followed
+        connect-timeout: 1000
+        response-timeout: 5s
   #build:
   #  version: "3.0"
   #
@@ -67,6 +70,7 @@ logging:
 resilience4j:
   timelimiter:
     configs:
+#      use this configuration if we already defined circuit breaker in GatewayServerApplication, and the configuration httpclient.response-timeout will be ignored.
       accountsCircuitBreaker:
         timeout-duration: 5s
         cancel-running-future: false
