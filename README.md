@@ -986,3 +986,47 @@ The steps to build a circuit breaker pattern using Spring Cloud Gateway Filter:
         #      The circuit breaker pattern going to wait 10 seconds (block all requests) to the microservice and response immediately. After 10 seconds, it will try to move to the half-open state from the open state.
         waitDurationInOpenState: 10000
   ```
+
+The steps to build a circuit breaker pattern using normal Spring Boot serivce (AccountsMicroservice):
+
+1. Add maven dependency: add spring-cloud-starter-circuitbreaker-resilience4j maven dependency inside pom.xml.
+2. Add circuit breaker related changes in Feign Client interfaces like shown below:
+```java
+@FeignClient(name = "cards", fallback = CardsFallback.class)
+public interface CardsFeignClient {
+    // Omitted code
+}
+
+@Component
+public class CardsFallback implements CardsFeignClient {
+  /**
+   * can choose whatever name inside this FeignClient interface, but please make sure the method signature like input parameters,
+   * return parameters along with the method access type should be same as what we have defined inside the actual microservice.
+   *
+   * @param correlationId
+   * @param mobileNumber
+   * @return
+   */
+  @Override
+  public ResponseEntity<CardsDto> fetchCardDetailsCustom(String correlationId, String mobileNumber) {
+    return null;
+  }
+}
+
+```
+
+3. Add properties: 
+```yaml
+spring:
+  cloud:
+    openfeign:
+      circuitbreaker:
+        enabled: true
+resilience4j.circuitbreaker:
+  configs:
+    default:
+      slidingWindowSize: 5
+      permittedNumberOfCallsInHalfOpenState: 2
+      failureRateThreshold: 50
+      waitDurationInOpenState: 10000
+```

@@ -54,7 +54,7 @@
 			<artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
 		</dependency>
 
-
+<!--		because spring cloud gateway built on Spring WebFlux (Project Reactor) so we need to add this dependency (reactor-resilience4j)-->
 		<dependency>
 			<groupId>org.springframework.cloud</groupId>
 			<artifactId>spring-cloud-starter-circuitbreaker-reactor-resilience4j</artifactId>

@@ -44,6 +44,11 @@ spring:
     stream:
       username: "guest"
       password: "guest"
+#      enable circuitbreaker
+  cloud:
+    openfeign:
+      circuitbreaker:
+        enabled: true
 
 management:
   endpoints:
@@ -97,3 +102,13 @@ logging:
     com:
       example:
         microserviceaccounts: DEBUG
+
+
+resilience4j:
+  circuitbreaker:
+    configs:
+      default:
+        sliding-window-size: 10
+        permitted-number-of-calls-in-half-open-state: 2
+        failure-rate-threshold: 50
+        wait-duration-in-open-state: 20000

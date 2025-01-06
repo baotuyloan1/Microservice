@@ -44,11 +44,17 @@ public class CustomersServiceImpl implements ICustomersService {
         customerDetailsDto.setAccountsDto(AccountMapper.mapToAccountDto(account, new AccountDto()));
 
         ResponseEntity<LoansDto> loansDtoResponseEntity =  loansFeignClient.fetchLoanDetails(correlationId,mobileNumber);
-        customerDetailsDto.setLoansDto(loansDtoResponseEntity.getBody());
+        // check null because using fallback method in FeignClient
+        if (loansDtoResponseEntity != null){
+            customerDetailsDto.setLoansDto(loansDtoResponseEntity.getBody());
+        }
 
         ResponseEntity<CardsDto> cardsDtoResponseEntity =  cardsFeignClient.fetchCardDetailsCustom(correlationId,mobileNumber);
-        customerDetailsDto.setCardsDto(cardsDtoResponseEntity.getBody());
+        // check null because using fallback method in FeignClient
+        if (cardsDtoResponseEntity != null){
+            customerDetailsDto.setCardsDto(cardsDtoResponseEntity.getBody());
 
+        }
         return customerDetailsDto;
     }
 }

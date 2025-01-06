@@ -19,7 +19,7 @@
     <licenses>
         <license/>
     </licenses>
-    <developers>
+     <developers>
         <developer/>
     </developers>
     <scm>
@@ -38,6 +38,13 @@
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
         </dependency>
+
+<!--        since we have not built the account microservice based upon spring reactor, we should not use the spring-cloud-starter-circuitbreaker-reactor-resilience4j instead we should use the spring-cloud-starter-circuitbreaker-resilience4j-->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-circuitbreaker-resilience4j</artifactId>
+        </dependency>
+
 
         <dependency>
             <groupId>org.springframework.cloud</groupId>
