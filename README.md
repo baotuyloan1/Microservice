@@ -1116,3 +1116,42 @@ resilience4j:
         retry-exceptions:
           - java.util.concurrent.TimeoutException
 ```
+
+# RATE LIMITER PATTERN
+
+The Rate Limiter pattern in microservices is a design pattern that helps control and limit the rate of incoming request to a service or API.
+It is used to prevent abuse, protect system resources, and ensure fair usage of the service.
+
+If we configure this rate limiter pattern inside our microservices, it is simply going to return a 429 HTTP status code, which is too many requests and it can't accept more requests from the client.
+This will indicates to clients that they can try to invoke the service after few seconds or minutes.
+
+We can enforce this limitation based upon like:
+- Limit the request based upon the session.
+- Limit the request based upon an IP address.
+- Limit the request based upon the logged user.
+- Limit the request based upon the tenant.
+- Limit the request based upon a server.
+- Additionally, we can also use this rate limiter pattern to provide services to users based upon their subscription tiers (basic user, premier user, enterprise user).
+
+### The Redis RateLimiter
+
+- replenishRate: This property defines how many requests per second to allow. This is the rate at which the token backed is filled.
+  - if you define 100, that means for every one second behind the scenes, 100 tokens will be added to your bucket.
+  - every bucket is assigned to a user or any other criteria based upon how you have defined KeyResolver.
+
+-  burstCapacity: This property is the maximum number of requests a user is allowed in a single second. This is the number of tokens the token bucket can hold. Setting this value to zero blocks all requests.
+
+- requestedToken: This property is how many tokens a request costs. This is the number of tokens taken from the bucket for each request and defaults to 1.
+
+```cmd
+docker run -p 6379:6379 --name easyredis -d redis
+```
+
+- install Apache HTTP server benchmarking tool
+
+send 10 requests will be sent.
+send 2 concurrent requests every time.
+-v indicates verbose. Value 3 indicates to print the detailed report in the output
+```cmd
+ab -n 10 -c 2 -v 3 http://localhost:8072/easybank/cards/api/contact-info
+``` 

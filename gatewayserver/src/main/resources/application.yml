@@ -19,6 +19,13 @@ spring:
         # use this configuration if we don't use circuit breaker. This global configuration will be ignored and whatever configurations specific to circuit breaker will be followed
         connect-timeout: 1000
         response-timeout: 5s
+#        Rate limiter pattern using redis
+  data:
+    redis:
+      connect-timeout: 2s
+      host: localhost
+      port: 6379
+      timeout: 1s
   #build:
   #  version: "3.0"
   #
