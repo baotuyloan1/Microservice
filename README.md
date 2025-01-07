@@ -1162,4 +1162,45 @@ ab -n 10 -c 2 -v 3 http://localhost:8072/easybank/cards/api/contact-info
 - We Want a particular low priority API to process lower number of requests, so other high priority APIs they can process without any issues.
 
 
+# BULKHEAD PATTERN
 
+The Bulkhead pattern is a design pattern that aims to improve the resilience and isolation of components or services within a system.
+It draws inspiration from the concept of bulkheads in ships, which are physical partitions that prevent the flooding of one compartment from affecting others, enhancing the overall stability and safety of the vessel.
+
+In the context of software systems, the Bulkhead pattern is used to isolate and limit the impact of failures or high loads in a component from spearing to other components.
+It helps ensure that a failure or heavy load in one part of the system does not bring down the entire system, enabling other components to continue functioning independently.
+
+Bulkhead Pattern helps us to allocate limit the resources which can be used for specific services. So that resource exhaustion can be reduced.
+
+The Bulkhead pattern is particularly useful in systems that require high availability, fault tolerance, and isolation between components.
+By compartmentalizing components and enforcing resource boundaries, the Bulkhead pattern enhances the resilience and stability of the system, ensuring that failures or heavy loads in one area do not bring down the entire system.
+
+
+![img_54.png](img_54.png)
+
+- Without Bulkhead, /myCustomerDetails will start eating all the threads, resources avaiable which will effect the performance of /myAccount
+- With Bulkhead, /myCustomerDetails and /myAccount will have their own resources, threads pool defined.
+
+# Aspect Order of Resilience patterns:
+
+The Resilience4j Aspects order is following:
+- Retry ( CircuitBreaer (RateLimiter (TimeLimiter (Bulkhead (Function)))))
+
+But we can change this default order.
+
+```text
+- resilience4j.retry.retryAspectOrder
+- resilience4j.circuitbreaker.circuitBreakerAspectOrder
+- resilience4j.ratelimiter.lateLimiterAspectOrder
+- resilience4j.timelimiter.timeLimiterAspectOrder
+- resilience4j.bulkhead.bulkheadAspectOrder
+```
+
+```yaml
+resilience4j:
+  circuitbreaker:
+    circuitBreakerAspectOrder: 1
+  retry:
+    retryAspectOrder: 2
+  ratelimiter:
+```

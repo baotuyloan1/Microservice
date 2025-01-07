@@ -100,7 +100,7 @@
 				<version>3.3.2</version>
 				<configuration>
 					<to>
-						<image>baotuyloan1/${project.artifactId}:250103</image>
+						<image>baotuyloan1/${project.artifactId}:250107</image>
 					</to>
 				</configuration>
 			</plugin>

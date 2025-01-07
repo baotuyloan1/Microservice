@@ -1,4 +1,17 @@
 services:
+  #  rate limiter pattern for Gateway(redis)
+  redis:
+    image: redis
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD-SHELL", "redis-cli ping | grep PONG"]
+      timeout: 10s
+      retries: 10
+    extends:
+      file: common-config.yml
+      service: network-deploy-service
+
   rabbit:
     image: rabbitmq:3.12-management
     hostname: rabbitmq
@@ -14,6 +27,7 @@ services:
     extends:
       file: common-config.yml
       service: network-deploy-service
+
   accountsdb:
     container_name: accountsdb
     ports:
@@ -23,6 +37,7 @@ services:
     extends:
       service: microservice-db-config
       file: common-config.yml
+
   loansdb:
     container_name: loansdb
     ports:
@@ -32,6 +47,7 @@ services:
     extends:
       service: microservice-db-config
       file: common-config.yml
+
   cardsdb:
     container_name: cardsdb
     ports:
@@ -41,8 +57,9 @@ services:
     extends:
       service: microservice-db-config
       file: common-config.yml
+
   configserver:
-    image: baotuyloan1/configserver:250103
+    image: baotuyloan1/configserver:250107
     #    if you don't provide container_name, a random name will given to your container by the Docker server
     container_name: configserver-ms
     ports:
@@ -63,7 +80,7 @@ services:
       service: microservice-base-config
 
   eurekaserver:
-    image: baotuyloan1/eurekaserver:250103
+    image: baotuyloan1/eurekaserver:250107
     #    if you don't provide container_name, a random name will given to your container by the Docker server
     container_name: eurekaserver-ms
     ports:
@@ -86,7 +103,7 @@ services:
       SPRING_APPLICATION_NAME: "eurekaserver"
 
   accounts:
-    image: baotuyloan1/accounts:250104
+    image: baotuyloan1/accounts:250107
     #    if you don't provide container_name, a random name will given to your container by the Docker server
     container_name: accounts-ms
     ports:
@@ -140,7 +157,7 @@ services:
   #        condition: service_healthy
 
   loans:
-    image: baotuyloan1/loans:250104
+    image: baotuyloan1/loans:250107
     #    if you don't provide container_name, a random name will given to your container by the Docker server
     container_name: loans-ms
     ports:
@@ -167,7 +184,7 @@ services:
         condition: service_healthy
 
   cards:
-    image: baotuyloan1/cards:250103
+    image: baotuyloan1/cards:250107
     #    if you don't provide container_name, a random name will given to your container by the Docker server
     container_name: cards-ms
     ports:
@@ -194,7 +211,7 @@ services:
         condition: service_healthy
 
   gatewayserver:
-    image: baotuyloan1/gatewayserver:250103
+    image: baotuyloan1/gatewayserver:250107
     #    if you don't provide container_name, a random name will given to your container by the Docker server
     container_name: gatewayserver-ms
     ports:
@@ -204,12 +221,17 @@ services:
       service: microservice-eureka-config
     environment:
       SPRING_APPLICATION_NAME: "gatewayserver"
+      SPRING_DATA_REDIS_HOST: redis
+      SPRING_DATA_REDIS_PORT: 6379
+      SPRING_DATA_REDIS_TIMEOUT: 1s
     depends_on:
       accounts:
         condition: service_healthy
       loans:
         condition: service_healthy
       cards:
+        condition: service_healthy
+      redis:
         condition: service_healthy
 
 # we create a network with the name easybank and the driver is bridge.

@@ -109,7 +109,7 @@
 				<artifactId>spring-boot-maven-plugin</artifactId>
 				<configuration>
 					<image>
-						<name>baotuyloan1/${project.artifactId}:250104</name>
+						<name>baotuyloan1/${project.artifactId}:250107</name>
 					</image>
 					<excludes>
 						<exclude>
