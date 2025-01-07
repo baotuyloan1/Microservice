@@ -6,6 +6,7 @@ import com.example.microserviceaccounts.dto.CustomerDto;
 import com.example.microserviceaccounts.dto.ErrorResponseDto;
 import com.example.microserviceaccounts.dto.ResponseDto;
 import com.example.microserviceaccounts.service.IAccountService;
+import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
 import io.github.resilience4j.retry.annotation.Retry;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -235,10 +236,29 @@ public class AccountsController {
                     )
             )
     })
+
+    /**
+     * if not define fallback the response will be 500
+     * {
+     *     "apiPath": "uri=/api/java-version",
+     *     "errorCode": "INTERNAL_SERVER_ERROR",
+     *     "errorMessage": "RateLimiter 'getJavaVersion' does not permit further calls",
+     *     "errorTime": "2025-01-07T15:31:21.5242608"
+     * }
+     *
+     *
+     */
+    @RateLimiter(name = "getJavaVersion", fallbackMethod = "getJavaVersionFallback")
     @GetMapping("/java-version")
     public ResponseEntity<String> getJavaVersion() {
         // get path from system environments in your machine, it also get properties in your application.properties or application.yml
         return ResponseEntity.status(HttpStatus.OK).body(environment.getProperty("build.version"));
+    }
+
+    public ResponseEntity<String> getJavaVersionFallback(Throwable throwable) {
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body("Please try again later");
     }
 
     @Operation(

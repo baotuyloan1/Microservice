@@ -1155,3 +1155,11 @@ send 2 concurrent requests every time.
 ```cmd
 ab -n 10 -c 2 -v 3 http://localhost:8072/easybank/cards/api/contact-info
 ``` 
+
+
+# IMPLEMENTING RATELIMITER PATTERN IN ACCOUNTS
+
+- We Want a particular low priority API to process lower number of requests, so other high priority APIs they can process without any issues.
+
+
+

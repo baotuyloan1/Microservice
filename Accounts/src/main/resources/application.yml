@@ -128,3 +128,20 @@ resilience4j:
 #        the retry will happen only for these kinds of exceptions, all the remaining exceptions will be ignored by the resilience4j. Don't have to mention ignore-exceptions above.
         retry-exceptions:
           - java.util.concurrent.TimeoutException
+  ratelimiter:
+#    for all apis.
+#    default:
+#      #        defines the time interval after which the system will refresh the quota (bucket).
+#      limit-refresh-period: 5000
+#      #        for every 5 seconds above, only one request will be allowed.
+#      limit-for-period: 1
+#      #        the maximum time that a particular thread can wait for the new refresh period to arrive with the new quota. (the thread is going to wait for a maximum of 1 second)
+#      timeout-duration: 1000
+    instances:
+      getJavaVersion:
+        #        defines the time interval after which the system will refresh the quota (bucket).
+        limit-refresh-period: 5000
+        #        for every 5 seconds above, only one request will be allowed.
+        limit-for-period: 1
+        #        the maximum time that a particular thread can wait for the new refresh period to arrive with the new quota. (the thread is going to wait for a maximum of 1 second)
+        timeout-duration: 1000
