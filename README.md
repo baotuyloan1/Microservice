@@ -1203,4 +1203,72 @@ resilience4j:
   retry:
     retryAspectOrder: 2
   ratelimiter:
+    rateLimiterAspectOrder: 3
 ```
+
+# OBSERVABILITY AND MONITORING OF MICROSERVICES
+
+## DEBUGGING A PROBLEM IN MICROSERVICES?
+
+## MONITORING PERFORMANCE OF SERVICE CALLS?
+
+## MONITORING SERVICES METRICS & HEALTH?
+
+### WHAT IS OBSERVABILITY?
+
+Observability is the ability to understand the internal state of a system by observing its outputs. 
+In the context of microservices, observability is achieved by collecting and analyzing data from a variety of sources, such as metrics, logs, and traces.
+
+The three pillars of observability are:
+
+- Metrics: Metrics are quantitative measurements of the health of a system. They can be used to track things like CPU, memory usage, and response times.
+
+- Logs: Logs are a record of events that occur inside a system. They can be used to track things like errors, exceptions or other unexpected events.
+
+- Traces: Traces are a record of the path that a request takes through a system. They can be used to track the performance of a request to identify.
+
+### WHAT IS MONITORING?
+
+Monitoring in microservices involves checking the telemetry data available for the application and defining alerts for known failure states.
+This process collects and analyzes data a system to identify and troubleshoot problems, as well as track the health of individual microservices and the overall health of the microservices network.
+
+Monitoring in microservices is important because it allows you to:
+
+- Identify and troubleshoot problems: By collecting and analyzing data from your microservices, you can identify problems before they cause outages or other disruptions.
+- Track the health of your microservices: Monitoring can help you to track the health of your microservices, so you can identify any microservices that are underperforming or that are experiencing problems.
+- Optimize your microservices: By monitoring your microservices, you can identify areas where you can optimize your microservices to improve performance and reliability.
+
+![img_55.png](img_55.png)
+
+
+In other words, monitoring is about collecting data and observability is about understanding data.
+
+Monitory is reacting to problems while observability is fixing them in real time.
+
+#### Logging
+
+Logs are discrete records of events that happen in software applications over time. They contain a timestamp that indicates when the event happened, as well as information about the event and its context.
+This information can be used to answer questions like "What happened at this time?", which thread of processing the event?, or "which user/tenant was in the context?".
+
+Logs are essential tools for troubleshooting and debugging tasks. They can be used to reconstruct what happened at a specific point in time in a single application instance.
+Logs are typically categorized according to the type or severity of the event, such as trace, debug, info, warn, and error. 
+This allows us to log only the most severe events in production, while still giving us the chance to change the log level temporarily during debugging.
+
+#### Managing Logs wih Grafana, Loki & Promtail
+
+Grafana is an open-source analytics and interactive visualization web application. It provides charts, graphs, and alerts for the web when connected to supported data sources.
+It can be easily installed using Docker and Docker Compose.
+
+Grafana is a popular tool for visualizing metrics, logs, and traces from a variety of sources. It is used by organizations of all sizes to monitor their applications and infrastructure.
+
+Grafana Loki is a horizontally scalable, highly available, and cost-effective log aggregation system. It is designed to be easy to use and to scale to meet the needs of even the most demanding applications.
+
+Promtail is a lightweight log agent that ships logs from your containers to Grafana Loki. It is easy to configure and can be used to collect logs from a wide variety of sources.
+
+Together, Grafana Loki and Promtail provide a powerful logging solution that can help you to understand and troubleshoot your applications.
+
+Grafana provides visualization of the log lines captured within Loki.
+
+![img_56.png](img_56.png)
+
+![img_57.png](img_57.png)
