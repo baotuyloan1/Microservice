@@ -87,6 +87,19 @@ services:
       service: network-deploy-service
       file: common-config.yml
 
+# metrics
+  prometheus:
+    image: prom/prometheus
+    container_name: prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ../observability/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+    extends:
+      file: common-config.yml
+      service: network-deploy-service
+
+
   grafana:
     image: grafana/grafana:latest
     environment:
@@ -95,26 +108,10 @@ services:
       - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
     depends_on:
       - gateway
-    entrypoint:
-      - sh
-      - -euc
-      - |
-        mkdir -p /etc/grafana/provisioning/datasources
-        cat <<EOF > /etc/grafana/provisioning/datasources/ds.yaml
-        apiVersion: 1
-        datasources:
-          - name: Loki
-            type: loki
-            access: proxy
-            url: http://gateway:3100
-            jsonData:
-              httpHeaderName1: "X-Scope-OrgID"
-            secureJsonData:
-              httpHeaderValue1: "tenant1"
-        EOF
-        /run.sh
     ports:
       - "3000:3000"
+    volumes:
+      - ../observability/grafana/datasources.yaml:/etc/grafana/provisioning/datasources/ds.yaml
     healthcheck:
       test: [ "CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:3000/api/health || exit 1" ]
       interval: 10s
@@ -247,6 +244,61 @@ services:
       service: microservice-db-config
       file: common-config.yml
 
+
+  accounts1:
+    image: baotuyloan1/accounts:250109
+    #    if you don't provide container_name, a random name will given to your container by the Docker server
+    container_name: accounts-ms1
+    ports:
+      - "8081:8080"
+    healthcheck:
+      #      call api and check if the status is returned up ?, otherwise exit
+      test: "curl --fail --silent localhost:8080/actuator/health/readiness | grep UP || exit 1"
+      #      do 10 times with an interval of 10s
+      interval: 10s
+      #      inside each check it has to wait for the maximum 5s to get the response from the URL.
+      timeout: 5s
+      #      if there is a failure, do the retries for 10 times
+      retries: 10
+      #      execute these healthy check command only after 10s
+      start_period: 10s
+    extends:
+      file: common-config.yml
+      service: microservice-eureka-config
+    environment:
+      SPRING_APPLICATION_NAME: "accounts"
+      SPRING_DATASOURCE_URL: jdbc:mysql://accountsdb:3306/accountsdb
+    depends_on:
+      cardsdb:
+        condition: service_healthy
+
+  accounts2:
+    image: baotuyloan1/accounts:250109
+    #    if you don't provide container_name, a random name will given to your container by the Docker server
+    container_name: accounts-ms2
+    ports:
+      - "8082:8080"
+    healthcheck:
+      #      call api and check if the status is returned up ?, otherwise exit
+      test: "curl --fail --silent localhost:8080/actuator/health/readiness | grep UP || exit 1"
+      #      do 10 times with an interval of 10s
+      interval: 10s
+      #      inside each check it has to wait for the maximum 5s to get the response from the URL.
+      timeout: 5s
+      #      if there is a failure, do the retries for 10 times
+      retries: 10
+      #      execute these healthy check command only after 10s
+      start_period: 10s
+    extends:
+      file: common-config.yml
+      service: microservice-eureka-config
+    environment:
+      SPRING_APPLICATION_NAME: "accounts"
+      SPRING_DATASOURCE_URL: jdbc:mysql://accountsdb:3306/accountsdb
+    depends_on:
+      cardsdb:
+        condition: service_healthy
+
   loansdb:
     container_name: loansdb
     ports:
@@ -256,6 +308,33 @@ services:
     extends:
       service: microservice-db-config
       file: common-config.yml
+
+  loans1:
+    image: baotuyloan1/loans:250109
+    #    if you don't provide container_name, a random name will given to your container by the Docker server
+    container_name: loans-ms1
+    ports:
+      - "8091:8090"
+    healthcheck:
+      #      call api and check if the status is returned up ?, otherwise exit
+      test: "curl --fail --silent localhost:8090/actuator/health/readiness | grep UP || exit 1"
+      #      do 10 times with an interval of 10s
+      interval: 10s
+      #      inside each check it has to wait for the maximum 5s to get the response from the URL.
+      timeout: 5s
+      #      if there is a failure, do the retries for 10 times
+      retries: 10
+      #      execute these healthy check command only after 10s
+      start_period: 10s
+    environment:
+      SPRING_APPLICATION_NAME: "loans"
+      SPRING_DATASOURCE_URL: jdbc:mysql://loansdb:3306/loansdb
+    extends:
+      file: common-config.yml
+      service: microservice-eureka-config
+    depends_on:
+      loansdb:
+        condition: service_healthy
 
   cardsdb:
     container_name: cardsdb
@@ -268,7 +347,7 @@ services:
       file: common-config.yml
 
   configserver:
-    image: baotuyloan1/configserver:250107
+    image: baotuyloan1/configserver:250109
     #    if you don't provide container_name, a random name will given to your container by the Docker server
     container_name: configserver-ms
     ports:
@@ -289,7 +368,7 @@ services:
       service: microservice-base-config
 
   eurekaserver:
-    image: baotuyloan1/eurekaserver:250107
+    image: baotuyloan1/eurekaserver:250109
     #    if you don't provide container_name, a random name will given to your container by the Docker server
     container_name: eurekaserver-ms
     ports:
@@ -312,7 +391,7 @@ services:
       SPRING_APPLICATION_NAME: "eurekaserver"
 
   accounts:
-    image: baotuyloan1/accounts:250107
+    image: baotuyloan1/accounts:250109
     #    if you don't provide container_name, a random name will given to your container by the Docker server
     container_name: accounts-ms
     ports:
@@ -366,7 +445,7 @@ services:
   #        condition: service_healthy
 
   loans:
-    image: baotuyloan1/loans:250107
+    image: baotuyloan1/loans:250109
     #    if you don't provide container_name, a random name will given to your container by the Docker server
     container_name: loans-ms
     ports:
@@ -393,7 +472,7 @@ services:
         condition: service_healthy
 
   cards:
-    image: baotuyloan1/cards:250107
+    image: baotuyloan1/cards:250109
     #    if you don't provide container_name, a random name will given to your container by the Docker server
     container_name: cards-ms
     ports:
@@ -420,7 +499,7 @@ services:
         condition: service_healthy
 
   gatewayserver:
-    image: baotuyloan1/gatewayserver:250107
+    image: baotuyloan1/gatewayserver:250109
     #    if you don't provide container_name, a random name will given to your container by the Docker server
     container_name: gatewayserver-ms
     ports:

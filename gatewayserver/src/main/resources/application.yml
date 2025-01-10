@@ -57,6 +57,10 @@ management:
   endpoint:
     gateway:
       enabled: true
+    #        groups all metrics related to the microservice under the application name
+  metrics:
+    tags:
+      application: ${spring.application.name}
 
 
 

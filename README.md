@@ -1254,7 +1254,7 @@ Logs are essential tools for troubleshooting and debugging tasks. They can be us
 Logs are typically categorized according to the type or severity of the event, such as trace, debug, info, warn, and error. 
 This allows us to log only the most severe events in production, while still giving us the chance to change the log level temporarily during debugging.
 
-#### Managing Logs wih Grafana, Loki & Promtail
+#### Managing Logs wih Grafana, Loki & Promta![img_59.png](img_59.png)il
 
 Grafana is an open-source analytics and interactive visualization web application. It provides charts, graphs, and alerts for the web when connected to supported data sources.
 It can be easily installed using Docker and Docker Compose.
@@ -1272,3 +1272,17 @@ Grafana provides visualization of the log lines captured within Loki.
 ![img_56.png](img_56.png)
 
 ![img_57.png](img_57.png)
+
+#### METRICS & MONITORING WITH SPRING BOOT ACTUATOR, MICROMETER, PROMETHEUS & GRAFANA
+
+1. Actuator is mainly used to expose operational information about the running application— health, metrics, info, dump, env, etc. It uses HTTP endpoints or JMX beans to enable us to interact with it.
+2. Micrometer automatically exposes /actuator/metrics data into something your monitoring system can understand. All you need to do is include that vendor-specific micrometer dependency in your application.
+3. The most common format for exporting metrics is the one used by Prometheus, which is "an open-source systems monitoring and alerting toolkit." Just as Loki aggregates and stores event logs, Prometheus does the same with metrics.
+4. Grafana is a visualization tool that can be used to create dashboards and charts from Prometheus data.
+
+
+### Distributed tracing in microservices
+
+![img_58.png](img_58.png)
+
+- Format pattern: Metadata Information, Trace id, Span id

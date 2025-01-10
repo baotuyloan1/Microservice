@@ -34,6 +34,14 @@
     </properties>
     <dependencies>
 
+<!--      micrometer supports for prometheus
+           expose the actuator metrics in a format that my Prometheus can understand.
+-->
+        <dependency>
+            <groupId>io.micrometer</groupId>
+            <artifactId>micrometer-registry-prometheus</artifactId>
+        </dependency>
+
         <dependency>
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>

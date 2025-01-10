@@ -32,6 +32,16 @@
 		<spring-cloud.version>2023.0.3</spring-cloud.version>
 	</properties>
 	<dependencies>
+
+
+		<!--      micrometer supports for prometheus
+                   expose the actuator metrics in a format that my Prometheus can understand.
+        -->
+		<dependency>
+			<groupId>io.micrometer</groupId>
+			<artifactId>micrometer-registry-prometheus</artifactId>
+		</dependency>
+
 		<dependency>
 			<groupId>org.springframework.cloud</groupId>
 			<artifactId>spring-cloud-starter-config</artifactId>
@@ -109,7 +119,7 @@
 				<artifactId>spring-boot-maven-plugin</artifactId>
 				<configuration>
 					<image>
-						<name>baotuyloan1/${project.artifactId}:250107</name>
+						<name>baotuyloan1/${project.artifactId}:250109</name>
 					</image>
 					<excludes>
 						<exclude>
