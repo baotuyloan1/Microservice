@@ -55,8 +55,9 @@ public class CustomerController {
                                                                     @RequestParam
                                                                     @Pattern(regexp = "^[0-9]{10}$", message = "Mobile number should be 10 digits")
                                                                     String mobileNumber) {
-        logger.debug("easyBank-correlation-id found: {}", correlationId);
+        logger.debug("fetchCustomerDetails method start");
         CustomerDetailsDto customerDetailsDto =customersService.fetchCustomerDetails(mobileNumber, correlationId);
+        logger.debug("fetchCustomerDetails method end");
         return ResponseEntity.status(HttpStatus.OK).body(customerDetailsDto);
     }
 }

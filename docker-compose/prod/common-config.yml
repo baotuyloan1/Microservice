@@ -14,6 +14,12 @@ services:
       start_period: 10s
     environment:
       MYSQL_ROOT_PASSWORD: root
+#    Tracing OpenTelemetry + Tempo + Grafana
+      JAVA_TOOL_OPTIONS: "-javaagent:/app/libs/opentelemetry-javaagent.jar"
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://tempo:4317
+#      no get metrics with the help of OpenTelemetry because we already used a better tool (Prometheus)
+      OTEL_METRICS_EXPORTER: none
+
 
   microservice-base-config:
     extends:

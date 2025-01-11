@@ -1286,3 +1286,17 @@ Grafana provides visualization of the log lines captured within Loki.
 ![img_58.png](img_58.png)
 
 - Format pattern: Metadata Information, Trace id, Span id
+
+1. OpenTelemetry:
+Using OpenTelemetry, generate traces and spans automatically. 
+OpenTelemetry is also known as Otel for short, is a vendor-neutral open-source.
+Observability framework for instrumenting, generating, collecting, and exporting telemetry data such as traces, metrics, and logs.
+
+2. Tempo:
+Index the tracing information using Grafana Tempo.
+Tempo is an open-source, highly scalable, and cost-effective distributed tracing backend designed for observability in cloud-native environments.
+It is a part of the Grafana observability stack and provides a dedicated solution for efficient storage, retrieval, and analysis of trace data.
+
+3. Grafana:
+Using Grafana, we can connect to Tempo as a datasource and see the distributed tracing in action with the help of visuals.
+We can integrate Loki and Tempo as well, so that we can jump to tracing details directly from logs inside Loki.

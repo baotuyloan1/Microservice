@@ -76,6 +76,10 @@ logging:
     com:
       baond:
         gatewayserver: DEBUG
+  pattern:
+    #    five characters for some log severity (info, warn, error)
+    # after the tag information, convey to my spring boot framework at runtime Open Telemetry library is going to generate the trace ID with the context information.
+    level: "%5p [${spring.application.name},%X{traceId},%X{spanId}]"
 
 
 resilience4j:

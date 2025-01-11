@@ -98,7 +98,18 @@ services:
     extends:
       file: common-config.yml
       service: network-deploy-service
-
+  tempo:
+    image: grafana/tempo
+    container_name: tempo
+    command: -config.file /etc/tempo-config.yml
+    ports:
+      - "3110:3100"
+      - "4317:4317"
+    volumes:
+      - ../observability/tempo/tempo.yml:/etc/tempo-config.yml
+    extends:
+      file: common-config.yml
+      service: network-deploy-service
 
   grafana:
     image: grafana/grafana:latest
@@ -268,6 +279,8 @@ services:
     environment:
       SPRING_APPLICATION_NAME: "accounts"
       SPRING_DATASOURCE_URL: jdbc:mysql://accountsdb:3306/accountsdb
+#      convey what is a service name to the Opentelemetry library
+      OTEL_SERVICE_NAME: "accounts"
     depends_on:
       cardsdb:
         condition: service_healthy
@@ -295,6 +308,8 @@ services:
     environment:
       SPRING_APPLICATION_NAME: "accounts"
       SPRING_DATASOURCE_URL: jdbc:mysql://accountsdb:3306/accountsdb
+      #      convey what is a service name to the Opentelemetry library
+      OTEL_SERVICE_NAME: "accounts"
     depends_on:
       cardsdb:
         condition: service_healthy
@@ -329,6 +344,8 @@ services:
     environment:
       SPRING_APPLICATION_NAME: "loans"
       SPRING_DATASOURCE_URL: jdbc:mysql://loansdb:3306/loansdb
+      #      convey what is a service name to the Opentelemetry library
+      OTEL_SERVICE_NAME: "loans"
     extends:
       file: common-config.yml
       service: microservice-eureka-config
@@ -366,6 +383,9 @@ services:
     extends:
       file: common-config.yml
       service: microservice-base-config
+    environment:
+      #      convey what is a service name to the Opentelemetry library
+      OTEL_SERVICE_NAME: configserver
 
   eurekaserver:
     image: baotuyloan1/eurekaserver:250109
@@ -389,6 +409,8 @@ services:
       service: microservice-configserver-config
     environment:
       SPRING_APPLICATION_NAME: "eurekaserver"
+      #      convey what is a service name to the Opentelemetry library
+      OTEL_SERVICE_NAME: configserver
 
   accounts:
     image: baotuyloan1/accounts:250109
@@ -413,6 +435,8 @@ services:
     environment:
       SPRING_APPLICATION_NAME: "accounts"
       SPRING_DATASOURCE_URL: jdbc:mysql://accountsdb:3306/accountsdb
+      #      convey what is a service name to the Opentelemetry library
+      OTEL_SERVICE_NAME: "accounts"
     depends_on:
       cardsdb:
         condition: service_healthy
@@ -464,6 +488,8 @@ services:
     environment:
       SPRING_APPLICATION_NAME: "loans"
       SPRING_DATASOURCE_URL: jdbc:mysql://loansdb:3306/loansdb
+      #      convey what is a service name to the Opentelemetry library
+      OTEL_SERVICE_NAME: "loans"
     extends:
       file: common-config.yml
       service: microservice-eureka-config
@@ -494,6 +520,8 @@ services:
     environment:
       SPRING_APPLICATION_NAME: "cards"
       SPRING_DATASOURCE_URL: jdbc:mysql://cardsdb:3306/cardsdb
+      #      convey what is a service name to the Opentelemetry library
+      OTEL_SERVICE_NAME: "cards"
     depends_on:
       cardsdb:
         condition: service_healthy
@@ -509,6 +537,8 @@ services:
       service: microservice-eureka-config
     environment:
       SPRING_APPLICATION_NAME: "gatewayserver"
+      #      convey what is a service name to the Opentelemetry library
+      OTEL_SERVICE_NAME: "gatewayserver"
       SPRING_DATA_REDIS_HOST: redis
       SPRING_DATA_REDIS_PORT: 6379
       SPRING_DATA_REDIS_TIMEOUT: 1s

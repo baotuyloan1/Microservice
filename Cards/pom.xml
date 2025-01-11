@@ -29,9 +29,18 @@
 	<properties>
 		<java.version>17</java.version>
 		<spring-cloud.version>2023.0.3</spring-cloud.version>
+		<otelVersion>2.11.0</otelVersion>
 	</properties>
 	<dependencies>
 
+		<!--        during compilation, I don't need this open telementry-->
+		<!--        only when I'm trying to run my application at runtime-->
+		<dependency>
+			<groupId>io.opentelemetry.javaagent</groupId>
+			<artifactId>opentelemetry-javaagent</artifactId>
+			<version>${otelVersion}</version>
+			<scope>runtime</scope>
+		</dependency>
 		<!--      micrometer supports for prometheus
            expose the actuator metrics in a format that my Prometheus can understand.
 -->
@@ -119,7 +128,7 @@
 				<version>3.3.2</version>
 				<configuration>
 					<to>
-						<image>baotuyloan1/${project.artifactId}:250109</image>
+						<image>baotuyloan1/${project.artifactId}:250111</image>
 					</to>
 				</configuration>
 			</plugin>
