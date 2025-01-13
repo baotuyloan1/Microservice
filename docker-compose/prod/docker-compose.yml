@@ -99,7 +99,7 @@ services:
       file: common-config.yml
       service: network-deploy-service
   tempo:
-    image: grafana/tempo
+    image: grafana/tempo:2.4.2
     container_name: tempo
     command: -config.file /etc/tempo-config.yml
     ports:
@@ -257,7 +257,7 @@ services:
 
 
   accounts1:
-    image: baotuyloan1/accounts:250109
+    image: baotuyloan1/accounts:250113
     #    if you don't provide container_name, a random name will given to your container by the Docker server
     container_name: accounts-ms1
     ports:
@@ -286,7 +286,7 @@ services:
         condition: service_healthy
 
   accounts2:
-    image: baotuyloan1/accounts:250109
+    image: baotuyloan1/accounts:250113
     #    if you don't provide container_name, a random name will given to your container by the Docker server
     container_name: accounts-ms2
     ports:
@@ -325,7 +325,7 @@ services:
       file: common-config.yml
 
   loans1:
-    image: baotuyloan1/loans:250109
+    image: baotuyloan1/loans:250113
     #    if you don't provide container_name, a random name will given to your container by the Docker server
     container_name: loans-ms1
     ports:
@@ -364,7 +364,7 @@ services:
       file: common-config.yml
 
   configserver:
-    image: baotuyloan1/configserver:250109
+    image: baotuyloan1/configserver:250113
     #    if you don't provide container_name, a random name will given to your container by the Docker server
     container_name: configserver-ms
     ports:
@@ -388,7 +388,7 @@ services:
       OTEL_SERVICE_NAME: configserver
 
   eurekaserver:
-    image: baotuyloan1/eurekaserver:250109
+    image: baotuyloan1/eurekaserver:250113
     #    if you don't provide container_name, a random name will given to your container by the Docker server
     container_name: eurekaserver-ms
     ports:
@@ -413,7 +413,7 @@ services:
       OTEL_SERVICE_NAME: configserver
 
   accounts:
-    image: baotuyloan1/accounts:250109
+    image: baotuyloan1/accounts:250113
     #    if you don't provide container_name, a random name will given to your container by the Docker server
     container_name: accounts-ms
     ports:
@@ -469,7 +469,7 @@ services:
   #        condition: service_healthy
 
   loans:
-    image: baotuyloan1/loans:250109
+    image: baotuyloan1/loans:250113
     #    if you don't provide container_name, a random name will given to your container by the Docker server
     container_name: loans-ms
     ports:
@@ -498,7 +498,7 @@ services:
         condition: service_healthy
 
   cards:
-    image: baotuyloan1/cards:250109
+    image: baotuyloan1/cards:250113
     #    if you don't provide container_name, a random name will given to your container by the Docker server
     container_name: cards-ms
     ports:
@@ -527,7 +527,7 @@ services:
         condition: service_healthy
 
   gatewayserver:
-    image: baotuyloan1/gatewayserver:250109
+    image: baotuyloan1/gatewayserver:250113
     #    if you don't provide container_name, a random name will given to your container by the Docker server
     container_name: gatewayserver-ms
     ports:

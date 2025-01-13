@@ -40,5 +40,10 @@ datasources:
     url: http://gateway:3100
     jsonData:
       httpHeaderName1: "X-Scope-OrgID"
+      derivedFields:
+      - datasourceUid: tempo #The UID of tempo above _  uid: tempo
+        matcherRegex: "\\[.+,(.+),.+\\]" # strings with special character inside JAVA
+        name: TraceID
+        url: '$${__value.raw}' # need two dollar signs, since this is .yaml file
     secureJsonData:
       httpHeaderValue1: "tenant1"

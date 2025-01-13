@@ -8,6 +8,13 @@ RUN apt-get update && apt-get install -y curl
 # Clean up to reduce image size
 RUN apt-get clean && rm -rf /var/lib/apt/lists/*
 
+# Use for OpenTelemetry Java Agent,
+# Create the 'libs' directory
+RUN mkdir -p /app/libs
+# we need to download the opentelemetry-javaagent-2.11.0.jar.
+# use the jar file inside the container. Because when build a jar, if we declare this in the pom file, the jar file will only be available inside the file .jar
+RUN curl -L -o /app/libs/opentelemetry-javaagent-1.33.5.jar \
+    https://repo1.maven.org/maven2/io/opentelemetry/javaagent/opentelemetry-javaagent/1.33.5/opentelemetry-javaagent-1.33.5.jar
 
 #Information around who maintains the image
 MAINTAINER github.com/baotuyloan1

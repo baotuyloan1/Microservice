@@ -16,7 +16,9 @@ Make sure you have a plugin related to the maven inside your pom.xml
 With the help of this Spring boot Maven plugin. We can generate a Docker image and behind the scenes this Spring Boot Maven plugin is going to leverage Buildpacks and Paquito to generate a production ready Docker image.
 
 ```command
-mvn spring-boot:build-image
+
+[//]: # (mvn spring-boot:build-image)
+mvn compile jib:dockerBuild
 ```
 ![img_1.png](img_1.png)
 

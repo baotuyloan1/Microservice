@@ -1300,3 +1300,11 @@ It is a part of the Grafana observability stack and provides a dedicated solutio
 3. Grafana:
 Using Grafana, we can connect to Tempo as a datasource and see the distributed tracing in action with the help of visuals.
 We can integrate Loki and Tempo as well, so that we can jump to tracing details directly from logs inside Loki.
+
+*Two approaches to link Loki to Tempo (with TractID)*
+1. Regex Derived fields(create a link from values in Loki to Tempo)
+    \[.+,(.+),.+\]
+    
+    ![img_61.png](img_61.png)
+
+2. ![img_62.png](img_62.png)
