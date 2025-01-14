@@ -1308,3 +1308,103 @@ We can integrate Loki and Tempo as well, so that we can jump to tracing details 
     ![img_61.png](img_61.png)
 
 2. ![img_62.png](img_62.png)
+
+
+# MICROSERVICES SECURITY
+
+- Using OAuth2/OpenID Connect, KeyCloak (IAM), Spring Security
+
+Oauth2 is a security standard or a security specification that any organization can follow to secure their web applications, mobile applications, or microservices regardless of what is type of application that an organization develops,
+they can leverage these Oauth2 specifications to secure their applications.
+
+## PROBLEM THAT OAUTH2 SOLVES
+
+2 problems that OAuth2 solves:
+
+![img_63.png](img_63.png)
+
+- Temporary access tokens like login Stack Overflow by the GitHub approach.
+
+## INTRODUCTION TO OAUTH2
+
+OAuth stands for Open Authorization. It's a free and open protocol, built on IETF standards and licenses from the Open Web Foundation.
+OAuth 2.1 is a security standard where you give one application permission to access your data in another application.
+The steps to grant permission, or consent, are often referred to as authorization or even delegated authorization.
+You authorize one application to access your data, or use features in another application on your behalf, without giving them your password.
+
+- Supports all kinds of Apps: oAuth2 supports multiple use cases addressing different device capabilities. It supports server-to-server apps, browser-based apps, mobile/native apps, IoT devices and consoles/TVs.
+It has various authorization grant flows like Authorization Code grant, Client Credentials Grant Type etc. to support all kinds of apps communication.
+
+- Separation Of Auth logic: Inside OAuth2, we have an Authorization Server which receives requests from the Client for Access Tokens and issues them upon successful authentication. 
+This enables us to maintain all the security logic in a single place. Regardless of how many applications an organization has, they all can connect to Auth server to perform login operation.
+All user credentials & client application credentials will be maintained in a single location which is inside Auth Server.
+
+- No need to share Credentials: If you plan to allow a third-party application and services to access your resources, then there is no need to share your credentials.
+In many ways, you can think of the OAth2 token as a "access card" at any office/hotel. These tokens provides limited access to someone, without handing over full control in the form of the master key.
+
+# OAUTH2 TERMINOLOGY
+
+- Resource Owner - It is you the end user. In the scanario of Stackoverflow, the end user who want to use the GitHub services to get his details.
+In other words, the end user owns the resources (email, profile), that's why we call him as Resource owner.
+
+- Client-The website, mobile app or API will be the client as it is the one which interacts with GitHub services on behalf of the source owner/end user.
+In the scenario of Stackoverflow, the Stackoverflow website is Client.
+
+- Authorization Server—This is the server that knows about resource owner. In other words, resource owner should have an account in this server.
+In this scanrio of Stackoverflow, the GitHub server which has authorization logic acts as Authorization server.
+
+- Resource Server - This is the server where the resources that client wants to consume are hosted.
+In the scanrio of Stackoverflow, the resources like User Email, Profile details are hosted inside Github server. So it will act as a resource server.
+
+- Scopes - These are the granular permissions the Client wants, such as access to data or to perform certain actions.
+THe Auth server can issue an access token to client with the scope of Email, READ...
+
+### WHAT IS OPENID CONNECT 
+
+OpenID Connect is a protocol that sít on top of the OAuth 2.0 framework.
+While OAuth 2.0 provides authorization via an access token containing scopes, OpenID Connect provides authentication by introducing a new ID token which contains a new set of information and claims specifically for identity.
+With the ID token, OpenID Connect brings standards around sharing sharing identify details among the applications.
+
+The OpenID Connect flow looks the same as OAuth. The only differences are, in the initial request, a spcific scope of *openid* is used, and in the final exchange the client receives both an Access Token and an ID Token.
+
+### Why is OpenID Connect important?
+
+- Identify is the key to any application. At the core of modern authorization is OAuth 2.0, but OAuth 2.0 lacks an authentication component. Implementing OpenID Connect on top of OAuth 2.0 completes an IAM (Idendity & Access Management) strategy.
+- As more and more applications need to connect with each other and more identities are being populated on the internet, the demand to be able to share these identities is also increased. With OpenID connect, application can share the identities easily and standard way.
+
+![img_64.png](img_64.png)
+
+OpenID Connect add below details to OAuth 2.0:
+1. OIDC standardizes the scopes to openid, profile, email, and address
+2. ID Token using JWT standard.
+3. OIDC exposes the standardized "/userinfo" endpoint.
+
+- Products built based upon the OpenID and OAuth2 standards.
+  - Free: Keycloak
+  - Commercial: Okta, Amazon Cognito (AWS), FusionAuth, ForgeRock
+
+To build your own authorization server, recently Spring team also developed a new project with the name Spring Authorization.
+
+# Client Credentials Grant Type Flow In OAuth2.
+
+1. Client to Auth Server: I want to access protected resources. Here are my credentials. No user involved in this. There is no UI application involved.
+    - Where client is making a request to Auth Server endpoint, have to send the below important details:
+      - client_id & client_secret: the credentials of the client to authenticate itself.
+      - scope: similar to authorities. Specifies level of access that client is requesting like EMAIL, PROFILE...
+      - grant_type: with the value 'client_credentials' which indicates that we want to follow a client credentials grant type.
+        - This is the most simplest grant type flow in OAuth2.
+        - We use this authentication flow only if there is no user and UI involved. Like in the scenarios where 2 different applications want to share data between them using backend APIs.
+
+2. Auth Server to Client: Hey Client, The credentials provided are correct. Here is the ACCESS TOKEN to access the protected resources.
+3. Client to Resource Server: Hey Resource Server, I want to access a protected resources. Here is the access token issued by Auth server
+4. Resource Server to Client: Hey Client, Your token is validated successfully. Here are the resources you requested
+
+![img_65.png](img_65.png)
+
+# SECURING GATEWAY USING CLIENT CREDENTIALS GRANT TYPE FLOW IN OAUTH2
+
+![img_66.png](img_66.png)
+
+Unsecured services deployed behind the docker network or Kubernetes firewall network. So can't be accessed directly.
+
+*Note:* When ever an external system trying to communicate with Spring Cloud Gateway where there is no end user involved, then we need to use the OAuth2 Client Credentials grant flow for Authentication & Authorization.
