@@ -15,6 +15,7 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: root
 
+
   microservice-base-config:
     extends:
       service: network-deploy-service
@@ -28,6 +29,11 @@ services:
           memory: 1G
     environment:
       SPRING_RABBITMQ_HOST: "rabbit"
+      #    Tracing OpenTelemetry + Tempo + Grafana
+      JAVA_TOOL_OPTIONS: "-javaagent:/app/libs/opentelemetry-javaagent-1.33.5.jar"
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://tempo:4317
+      #      no get metrics with the help of OpenTelemetry because we already used a better tool (Prometheus)
+      OTEL_METRICS_EXPORTER: none
 
   microservice-configserver-config:
     extends:
@@ -36,7 +42,7 @@ services:
       configserver:
         condition: service_healthy
     environment:
-      SPRING_PROFILES_ACTIVE: default
+      SPRING_PROFILES_ACTIVE: qa
       SPRING_CONFIG_IMPORT: "optional:configserver:http://configserver:8071/"
 
   microservice-eureka-config:

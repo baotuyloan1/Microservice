@@ -42,7 +42,7 @@ services:
       configserver:
         condition: service_healthy
     environment:
-      SPRING_PROFILES_ACTIVE: default
+      SPRING_PROFILES_ACTIVE: prod
       SPRING_CONFIG_IMPORT: "optional:configserver:http://configserver:8071/"
 
   microservice-eureka-config:
