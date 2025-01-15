@@ -43,6 +43,18 @@ spring:
     stream:
       username: "guest"
       password: "guest"
+#      for validate the token from the client to the gateway server by using the auth server.
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+#          during the startup of the resource server, it is going to connect to the auth server (Keycloak) and going to download a public certificate
+#         Using this public certificate, my resource server can validate if a given access token is really issued by the keycloak server.
+#          all those checks on the access token, it can perform with the help of this public certificate
+#          The keycloak is going to have private certificates. Using the private certificates, the keycloak can only issue the new access tokens.
+#          Whereas with the help of this public certificate, any server like resource server can validate if a given access token is valid or not.
+          jwk-set-uri: http://localhost:7080/realms/master/protocol/openid-connect/certs
+
 
 management:
   endpoints:

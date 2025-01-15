@@ -1408,3 +1408,33 @@ To build your own authorization server, recently Spring team also developed a ne
 Unsecured services deployed behind the docker network or Kubernetes firewall network. So can't be accessed directly.
 
 *Note:* When ever an external system trying to communicate with Spring Cloud Gateway where there is no end user involved, then we need to use the OAuth2 Client Credentials grant flow for Authentication & Authorization.
+
+
+![img_67.png](img_67.png)
+
+![img_68.png](img_68.png)
+
+Official Documentation: https://www.keycloak.org/
+
+```terminal
+docker run -d -p 7080:8080 -e KC_BOOTSTRAP_ADMIN_USERNAME=admin -e KC_BOOTSTRAP_ADMIN_PASSWORD=admin quay.io/keycloak/keycloak:26.0.8 start-dev
+```
+d : detached mode
+e : environment variable
+KC_BOOTSTRAP_ADMIN_USERNAME: the username that we want to set for our keycloak auth server
+KC_BOOTSTRAP_ADMIN_PASSWORD: the password that we want to set for our keycloak auth server
+quay.io/keycloak/keycloak:26.0.8: the docker image name
+start-dev: run the keycloak in dev mode
+
+with dev mode, the keycloack is going to have some internal database using that we can store all the user credentials and the client credentials.
+But in production environments, we should have some dedicated database configured for their keycloak auth server.
+
+Realm in KEYCLOAK:
+- You can create multiple realms in Keycloak like dev, qa, prod...
+- We can't force our team qa to use the same credentials like we have inside the production. That's why we create multiple realms.
+
+![img_69.png](img_69.png)
+
+![img_71.png](img_71.png)
+
+jwt.io
