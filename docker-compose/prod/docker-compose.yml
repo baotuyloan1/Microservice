@@ -1,4 +1,18 @@
 services:
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:26.0.8
+    container_name: keycloak
+    ports:
+      - "7080:8080"
+    environment:
+      KC_BOOTSTRAP_ADMIN_USERNAME: "admin"
+      KC_BOOTSTRAP_ADMIN_PASSWORD: "admin"
+    command: "start-dev" # the Keycloak will leverage the internal database.
+    extends:
+      file: common-config.yml
+      service: network-deploy-service
+
   #  read component of the loki
   read:
     image: grafana/loki:latest
@@ -257,11 +271,9 @@ services:
 
 
   accounts1:
-    image: baotuyloan1/accounts:250113
+    image: baotuyloan1/accounts:250116
     #    if you don't provide container_name, a random name will given to your container by the Docker server
     container_name: accounts-ms1
-    ports:
-      - "8081:8080"
     healthcheck:
       #      call api and check if the status is returned up ?, otherwise exit
       test: "curl --fail --silent localhost:8080/actuator/health/readiness | grep UP || exit 1"
@@ -286,11 +298,9 @@ services:
         condition: service_healthy
 
   accounts2:
-    image: baotuyloan1/accounts:250113
+    image: baotuyloan1/accounts:250116
     #    if you don't provide container_name, a random name will given to your container by the Docker server
     container_name: accounts-ms2
-    ports:
-      - "8082:8080"
     healthcheck:
       #      call api and check if the status is returned up ?, otherwise exit
       test: "curl --fail --silent localhost:8080/actuator/health/readiness | grep UP || exit 1"
@@ -325,11 +335,9 @@ services:
       file: common-config.yml
 
   loans1:
-    image: baotuyloan1/loans:250113
+    image: baotuyloan1/loans:250116
     #    if you don't provide container_name, a random name will given to your container by the Docker server
     container_name: loans-ms1
-    ports:
-      - "8091:8090"
     healthcheck:
       #      call api and check if the status is returned up ?, otherwise exit
       test: "curl --fail --silent localhost:8090/actuator/health/readiness | grep UP || exit 1"
@@ -364,11 +372,9 @@ services:
       file: common-config.yml
 
   configserver:
-    image: baotuyloan1/configserver:250113
+    image: baotuyloan1/configserver:250116
     #    if you don't provide container_name, a random name will given to your container by the Docker server
     container_name: configserver-ms
-    ports:
-      - "8071:8071"
     healthcheck:
       #      call api and check if the status is returned up ?, otherwise exit
       test: "curl --fail --silent localhost:8071/actuator/health/readiness | grep UP || exit 1"
@@ -388,7 +394,7 @@ services:
       OTEL_SERVICE_NAME: configserver
 
   eurekaserver:
-    image: baotuyloan1/eurekaserver:250113
+    image: baotuyloan1/eurekaserver:250116
     #    if you don't provide container_name, a random name will given to your container by the Docker server
     container_name: eurekaserver-ms
     ports:
@@ -413,11 +419,9 @@ services:
       OTEL_SERVICE_NAME: configserver
 
   accounts:
-    image: baotuyloan1/accounts:250113
+    image: baotuyloan1/accounts:250116
     #    if you don't provide container_name, a random name will given to your container by the Docker server
     container_name: accounts-ms
-    ports:
-      - "8080:8080"
     healthcheck:
       #      call api and check if the status is returned up ?, otherwise exit
       test: "curl --fail --silent localhost:8080/actuator/health/readiness | grep UP || exit 1"
@@ -469,11 +473,9 @@ services:
   #        condition: service_healthy
 
   loans:
-    image: baotuyloan1/loans:250113
+    image: baotuyloan1/loans:250116
     #    if you don't provide container_name, a random name will given to your container by the Docker server
     container_name: loans-ms
-    ports:
-      - "8090:8090"
     healthcheck:
       #      call api and check if the status is returned up ?, otherwise exit
       test: "curl --fail --silent localhost:8090/actuator/health/readiness | grep UP || exit 1"
@@ -498,11 +500,9 @@ services:
         condition: service_healthy
 
   cards:
-    image: baotuyloan1/cards:250113
+    image: baotuyloan1/cards:250116
     #    if you don't provide container_name, a random name will given to your container by the Docker server
     container_name: cards-ms
-    ports:
-      - "9000:9000"
     healthcheck:
       #      call api and check if the status is returned up ?, otherwise exit
       test: "curl --fail --silent localhost:9000/actuator/health/readiness | grep UP || exit 1"
@@ -527,7 +527,7 @@ services:
         condition: service_healthy
 
   gatewayserver:
-    image: baotuyloan1/gatewayserver:250113
+    image: baotuyloan1/gatewayserver:250116
     #    if you don't provide container_name, a random name will given to your container by the Docker server
     container_name: gatewayserver-ms
     ports:
@@ -539,6 +539,7 @@ services:
       SPRING_APPLICATION_NAME: "gatewayserver"
       #      convey what is a service name to the Opentelemetry library
       OTEL_SERVICE_NAME: "gatewayserver"
+      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK-SET-URI: "http://keycloak:8080/realms/master/protocol/openid-connect/certs"
       SPRING_DATA_REDIS_HOST: redis
       SPRING_DATA_REDIS_PORT: 6379
       SPRING_DATA_REDIS_TIMEOUT: 1s
