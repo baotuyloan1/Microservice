@@ -1438,3 +1438,116 @@ Realm in KEYCLOAK:
 ![img_71.png](img_71.png)
 
 jwt.io
+
+View all endpoints:
+![img_72.png](img_72.png)
+
+Assign roles to a client for using SecurityWebFilterChain:
+
+![img_73.png](img_73.png)
+
+If you don't see the necessary roles, create the necessary roles:
+
+![img_74.png](img_74.png)
+
+# AUTHORIZATION CODE GRANT TYPE FLOW IN OAUTH2
+
+1. User to Client: I want to access my resources.
+2. Client to User: The client will redirect the user to the login page of the auth server
+3. User to Auth Server: Hello Auth Server, pls allow the client to access my resources. Here are my credentials to prove my identity.
+4. Auth Server to Client: Hey Client, User allowed you to access his resources. Here is AUTHORIZATION CODE.
+5. Client to Auth Server: Here are my client credentials, AUTHORIZATION CODE. The Auth Server will validate if the authorization code is valid, it is also going to validate the client credentials whether the client ID and client secret are valid or not. Please provide me an access token.
+6. Auth Server to Client: Here is the access token from Auth Server.
+7. Client to Resource Server: Hey Resource Server, I want to access the user resources. Here is the access token from Auth Server.
+8. Resource Server To Client: Hey Client, Your token is validated successfully (by the Auth Server). Here are the resources you requested.
+
+![img_75.png](img_75.png)
+
+In the steps 2 & 3, where client making request to Auth Server endpoint have to send the below important details,
+- client_id: the id which identifies the client application by the Auth Server. This will be granted when the client registers first time with the Auth server.
+- redirect_uri: the URI value which the Auth server needs to redirect post successful authentication. If a default value is provided during the registration, then this value is optional.
+- scope: similar to authorities. Specifies level of acess that client is requesting like READ.
+- state: CSRF token value to protect from CSRF attacks.
+- response_type: with the value 'code' which indicates that we want to follow authorization code grant.
+
+In step 5 where the client after received a authorization code from Auth server, it will again make a request to Auth server for a token with the below values:
+- code: the authorization code received from the above steps.
+- client_id & client_secret: the client credentials which are registered with the auth server. Please note that these are not user credentials.\
+- grant_type: with the value 'authorization_code' which identifies the kind of grant type is used.
+- redirect_uri.
+
+# AUTHORIZATION CODE GRANT TYPE FLOW DETAILS
+
+1. Register a Client: Before you can begin the flow, you'll need to register a client and create a user.
+   Registration will give you a client ID and a secret your application will use during the OAuth flow.
+  Typically, this involves setting up a developer account at the service, then answering some questions about your application, uploading a logo...
+2. Build the authorization URL and redirect the user to the authorization server. Before authorization begins, it first generates a random string to use for the *state* parameter. The client will need to store this to be used in the next step.
+    ```text
+    https://authorization-server.com/authorize?
+      response_type=code
+      &client_id=dxLD5LqqXKo5yRDP9j22lPHd
+      &redirect_uri=https://www.oauth.com/playground/authorization-code.html
+      &scope=photo+offline_access
+      &state=bYy0EWkdEde0dxPm
+    ```
+3. After the user is redirected back to the client, verify the *state* matches
+   The user was redirected back to the client, and you'll notice a few additional query parameters in the URL:
+    ```text
+    ?state=ytNfF-5e0Ul2dKXA&code=02hzXJx2IwbRx7RKYavzxgeSp2-rab-2s54qJfws73o
+    ```
+   You need to first verify that the state parameter matches the value stored in this user's session so that you protect against CSRF attacks.
+4. Exchange the Authorization Code: Now you're ready to exchange the authorization code for an access token.
+   The client builds a POST request to the token endpoint with the following parameters:
+    ```text
+    POST https://authorization-server.com/token
+    grant_type=authorization_code
+    &client_id=dxLD5LqqXKo5yRDP9j22lPHd
+    &client_secret=y4VYrx7Vt5OqMry_PCHd0vJSMjV1hHjKq0VGfIbDb3ceoayX
+    &redirect_uri=https://www.oauth.com/playground/authorization-code.html
+    &code=02hzXJx2IwbRx7RKYavzxgeSp2-rab-2s54qJfws73odzVfL
+    ```
+   Note that the client's credentials are included in the POST body in this example. Other authorization servers may require that the credentials are sent as a HTTP Basic Authentication header.
+5. Exchange the Access Token: Now you're ready to exchange the access token for a refresh token and ID token.
+6. Token Endpoint Response: The response includes the access token and refresh token.
+    ```text
+    {
+    "token_type": "Bearer",
+    "expires_in": 86400,
+    "access_token": "k6nyjOGsj33WzyxhJhznM0BIndIBEGr-7PpSZIsaBuHu6PiND3kD5kIyTCFT17YRsOGsJ8bc",
+    "scope": "photo offline_access",
+    "refresh_token": "2BgLWAu851PS6Nkhthio_G_v"
+    }
+    ```
+   
+*Reference:* https://www.oauth.com/playground
+
+### Why in the Authorization Code grant type client is making request 2 times to Auth server for authorization code and access token.
+
+- In the first step, authorization server will make sure that user directly interacted with it along with the credentials. If the details are correct, auth server sends the authorization code to the client.
+- Once it receives the authorization code, in this step, the client has to prove its identity along with the authorization code & client credentials to get the access token.
+
+### Why can't Auth server directly club both the steps together and provide the token in a single step?
+The answer is that we used to have that grant type as well which is called as 'Implicit Grant Type'. But this grant type is deprecated as it is less secure.
+
+# Register client & end user inside KeyCloak for Authorization code grant flow.
+
+![img_76.png](img_76.png)
+![img_77.png](img_77.png)
+![img_79.png](img_79.png)
+
+Create end user details inside the keycloak auth server (using UI):
+![img_80.png](img_80.png)
+![img_81.png](img_81.png)
+![img_82.png](img_82.png)
+
+Keycloak exposes a lot of REST APIs using these REST APIs any properly authenticated application, they can connect with the Keycloak auth server, and they can create users by invoking these REST APIs.
+All the actions that an admin can do with the help of UI, all these actions are supported by REST API as well.
+Official documents:  https://www.keycloak.org/docs-api/latest/rest-api/index.html
+
+Using PostMan to test Authorization Code grant type: 
+
+![img_84.png](img_84.png)
+![img_85.png](img_85.png)
+
+*NOTE* When we want to assign roles for an application, we need to go to the service roles. We did the same when we tried to assign roles for the client credentials application.
+With User Details Role (End User Account) we need to go to the *Role mapping*
