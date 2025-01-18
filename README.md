@@ -1551,3 +1551,107 @@ Using PostMan to test Authorization Code grant type:
 
 *NOTE* When we want to assign roles for an application, we need to go to the service roles. We did the same when we tried to assign roles for the client credentials application.
 With User Details Role (End User Account) we need to go to the *Role mapping*
+
+
+
+# BUILDING EVENT-DRIVEN MICROSERVICES
+
+Inside the synchronous communication, there are two approaches majorly used by everyone:
+1. imperative approach: whenever a microservice1 is trying to invoke the microservice2. There will be a thread dedicated assigned to this communication, and the thread is blocked for this operation is going to wait continuously for the response to come from microservice2
+2. reactive approach: there won't be any threads blocked on the microservice1 to wait for the response from the microservice2. Instead, there will be a thread while invoking the microservice2. After the invocation the thread will go back to the thread pool and it will try to pick up the next that are coming towards the microservice. When the response from the microservice2 is received by the microservice1, then only a thread from the thread pool is going to be assigned.
+
+Avoiding temporal coupling whenever possible:
+- Temporal coupling occurs when a caller service expects an immediate response from a called service before continuing its processing.
+- If the called service experiences any delay in responding, it negatively impacts the overall response time of the caller.
+- This scenario commonly arises in synchronous communication between services.
+- How we can prevent temporal coupling and mitigate?
+- For example: You have a microserviceA and a microserviceB. The microserviceA is dependent on microservice B.
+Whenever microserviceA is trying to invoke the microserviceB, the microserviceA is going to continuously wait till it is going to get a response from the microserviceB.
+In this scenario, the microserviceA has a temporal coupling with the microserviceB.
+Any slow behavior of microserviceB is going to have an impact on the microserviceA.
+
+
+Using asynchronous communication:
+- Synchronous communication between services is not always necessary. 
+- In many real-world scenarios, asynchronous communication can fulfill the requirements effectively.
+
+Building Event driven microservice:
+- An event, as an incident that happens inside your microservices, such as a state transition or update your system.
+- When an event takes place, we need to alert the concerned parties.
+
+Event-driven microservices can be built using Event-driven architecture, producing and consuming events using Async communication, event brokers, Spring Cloud Function, Spring Cloud Stream.
+
+# Event-driven models
+
+Event-driven architectures can be built using two primary models:
+1. Publisher/Subscriber (Pub/Sub) model (RabbitMQ):
+This model revolves around subscriptions. Producers generate events that are distributed to all subscribers for consumption. Once an event is received, it cannot be replayed, which means new subscribers joining later will not have access to past events.
+2. Event Streaming Model (Kafka):
+In this model, events are written to a log in a sequential manner. Producers publish events as they occur, and these events are stored in a well-ordered fashion.
+Instead of subscribing to events, consumers can read from any part of the event stream.
+One advantage of this model is that events can be replayed, allowing clients to join any time and receive all past events.
+
+The pub/sub models are frequently paired with RabbitMQ as a popular option. On the other hand, Apache Kafka is a robust platform widely utilized for event stream processing.
+
+
+## What are we going to build using a pub/sub model ?
+
+![img_86.png](img_86.png)
+
+
+### Using RabbitMQ for publish/subscribe communications:
+
+RabbitMQ, an open-source message broker, is widely recognized for its utilization of AMQP (Advanced Message Queuing Protocol) and its ability to offer flexible asynchronous messaging. distributed deployment, comprehensive monitoring.
+Furthermore, recent versions of RabbitMQ have incorporated event streaming functionalities into their feature set.
+
+- Producer: The entity responsible for sending messages (also known as publisher).
+- Consumer: The entity tasked with receiving messages (also known as the subscriber).
+- Message broker: The middleware that receives messages from producers and directs them to the appropriate consumers.
+
+![img_87.png](img_87.png)
+
+The messaging model of AMQP operates on the principles of exchanges and queses.
+![img_88.png](img_88.png)
+
+The producer will always send the message to an exchange inside the message broker.
+This exchange is going to identify to which queue it has to send the message details.
+Inside the message broker, there will have any number of exchanges and queues. These queues the consumers are going to subscribe.
+The preducer can send a message to the exchange and based upon the exchange details, the message can go to the Queue1 or Queue2, then the corresponding consumer will be notified about this message.
+The message will be deleted from the queue and there is not rule that only one consumer has to be subscribed to a single queue.
+Any number of subscribers can be subscribed to a queue.
+Very similarly, a consumer can be subscribed to any number of queues.
+
+### Oficial Documentation: https://www.rabbitmq.com/
+
+
+# Sppring Cloud Function ?
+
+Spring Cloud Function facilitates the development of business logic by using functions that adhere to the standard interfaces introduced in Java 8, namely Supplier, Function and Consumer.
+Whatever business logic that the developers want to write, it simply to write the business logic indie the functions and the rest of the infrastructural concerns is going to be taken care by the Spring Cloud Function.
+
+- Supplier: A supplier is a function or lambda expression that produces an output without requiring any input. It can also be referred as a producer, publisher or source.
+That means whenever you write your business logic using supplier function interface, then your business logic is never going to expect any input.
+It's simply going to produce an event or produce an output. In simple words, your Supplier, function interface there won't be any input, but there will be an output.
+
+- Function: A function accepts input and generates an output. It is commonly referred to as a processor.
+It will take an input and it is going to process the input and after processing the input, it is going to generate an output.
+
+- Consumer: A consumer is a funtion that consumes input but does not produce any output. It can also be called a subscriber or sink.
+
+Why to use Spring Cloud Function?
+
+Because developing business logic with the help of spring cloud function is going to be simple and it also provide you a lot of flexibility to expose your business logic using various patterns.
+By default, all your logic that you wrote inside your functions will be exposed as a REST API automatically by your spring cloud function.
+If needed, you can also integrate these spring cloud functions with event brokers like RabbitMQ, Apache Kafka by adding more project which is Spring Cloud Stream.
+
+Spring Cloud Function features:
+
+- Programming styles: reactive, imperative or hybrid. 
+- POJO functions
+- Function composition which includes composing imperative functions and reactive.
+- REST support to expose functions as HTTP endpoints etc.
+- Streaming data (via Apache Kafka, Solace, RabbitMQ and more) to/from functions via a Spring Cloud Stream framework.
+- Packaging functions for deployments, specific to the target platform.
+
+
+The Spring Cloud Function is the best suitable for event driven architecture because these functions give flexibility to use to take our business logic wherever we want.

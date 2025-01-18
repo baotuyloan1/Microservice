@@ -1,0 +1,10 @@
+server:
+  port: 9010
+
+spring:
+  application:
+    name: "message"
+  cloud:
+    function:
+#      combine both email and sms into a single function
+      definition: email|sms
