@@ -9,5 +9,7 @@ CREATE TABLE IF NOT EXISTS `loans`(
     `created_at` DATE NOT NULL,
     `created_by` VARCHAR(20) NOT NULL,
     `updated_at` DATE DEFAULT NULL,
-    `updated_by` VARCHAR(20) DEFAULT NULL
+    `updated_by` VARCHAR(20) DEFAULT NULL,
+    `communication_sw` BOOLEAN DEFAULT FALSE
+
 );

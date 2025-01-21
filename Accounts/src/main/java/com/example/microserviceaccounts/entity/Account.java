@@ -1,5 +1,6 @@
 package com.example.microserviceaccounts.entity;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import lombok.*;
@@ -16,4 +17,6 @@ public class Account extends BaseEntity{
     private String accountType;
 
     private String branchAddress;
+
+    private Boolean communicationSw;
 }

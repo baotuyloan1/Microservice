@@ -1,6 +1,6 @@
-package com.baond.message.dto;
+package com.example.microserviceaccounts.dto;
 
-/**
+    /**
  *
  * @param accountNumber
  * @param name

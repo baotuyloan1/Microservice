@@ -2,6 +2,7 @@ package com.microservice.loans.service.impl;
 
 import com.microservice.loans.constants.LoanConstants;
 import com.microservice.loans.dto.LoansDto;
+import com.microservice.loans.dto.LoansMsgDto;
 import com.microservice.loans.entity.Loans;
 import com.microservice.loans.exception.LoansAlreadyExistException;
 import com.microservice.loans.exception.ResourceNotFoundException;
@@ -9,6 +10,9 @@ import com.microservice.loans.mapper.LoanMapper;
 import com.microservice.loans.repository.LoanRepository;
 import com.microservice.loans.service.ILoanService;
 import lombok.AllArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.cloud.stream.function.StreamBridge;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -17,6 +21,9 @@ import java.util.Random;
 @Service
 @AllArgsConstructor
 public class LoanServiceImpl implements ILoanService {
+
+    private static final Logger logger = LoggerFactory.getLogger(LoanServiceImpl.class);
+    private final StreamBridge streamBridge;
 
     private final LoanRepository loansRepository;
 
@@ -29,11 +36,20 @@ public class LoanServiceImpl implements ILoanService {
         if (optionalLoan.isPresent()) {
             throw new LoansAlreadyExistException("Loan already registered with give mobileNumber " + mobileNumber);
         }
-        loansRepository.save(createNewLoan(mobileNumber));
+        Loans loans = loansRepository.save(createNewLoan(mobileNumber));
+        sendCommunication(loans);
+    }
+
+    private void sendCommunication(Loans loans) {
+        LoansMsgDto loansMsgDto = new LoansMsgDto(loans.getLoanId(), loans.getMobileNumber(), loans.getLoanNumber(), loans.getLoanType(), loans.getTotalLoan(), loans.getAmountPaid(), loans.getOutstandingAmount());
+        logger.info("Sending Communication request for the details: {}", loansMsgDto);
+        var result = streamBridge.send("sendCommunication-out-0", loansMsgDto);
+        logger.info("Is the Communication request successfully triggered?: {}", result);
     }
 
     /**
      * Create a new Loan
+     *
      * @param mobileNumber - Mobile Number of the Customer
      * @return the new loan details
      */
@@ -71,7 +87,7 @@ public class LoanServiceImpl implements ILoanService {
                 () -> new ResourceNotFoundException("Loan", "LoanNumber", loansDto.getLoanNumber()));
         LoanMapper.mapToLoan(loansDto, loans);
         loansRepository.save(loans);
-        return  true;
+        return true;
     }
 
     /**
@@ -85,5 +101,23 @@ public class LoanServiceImpl implements ILoanService {
         );
         loansRepository.deleteById(loans.getLoanId());
         return true;
+    }
+
+    /**
+     * @param loansId - Long
+     * @return boolean indicating if the update of communication status is successful or not
+     */
+    @Override
+    public boolean updateCommunicationStatus(Long loansId) {
+        boolean isUpdated = false;
+        if (loansId != null){
+            Loans loans = loansRepository.findById(loansId).orElseThrow(
+                    () -> new ResourceNotFoundException("Loans", "loansId", String.valueOf(loansId))
+            );
+            loans.setCommunicationSw(true);
+            loansRepository.save(loans);
+            isUpdated = true;
+        }
+        return isUpdated;
     }
 }

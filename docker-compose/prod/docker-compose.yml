@@ -271,7 +271,7 @@ services:
 
 
   accounts1:
-    image: baotuyloan1/accounts:250116
+    image: baotuyloan1/accounts:250121
     #    if you don't provide container_name, a random name will given to your container by the Docker server
     container_name: accounts-ms1
     healthcheck:
@@ -293,12 +293,14 @@ services:
       SPRING_DATASOURCE_URL: jdbc:mysql://accountsdb:3306/accountsdb
 #      convey what is a service name to the Opentelemetry library
       OTEL_SERVICE_NAME: "accounts"
+      SPRING_RABBITMQ_HOST: "rabbit"
+
     depends_on:
       cardsdb:
         condition: service_healthy
 
   accounts2:
-    image: baotuyloan1/accounts:250116
+    image: baotuyloan1/accounts:250121
     #    if you don't provide container_name, a random name will given to your container by the Docker server
     container_name: accounts-ms2
     healthcheck:
@@ -320,6 +322,7 @@ services:
       SPRING_DATASOURCE_URL: jdbc:mysql://accountsdb:3306/accountsdb
       #      convey what is a service name to the Opentelemetry library
       OTEL_SERVICE_NAME: "accounts"
+      SPRING_RABBITMQ_HOST: "rabbit"
     depends_on:
       cardsdb:
         condition: service_healthy
@@ -335,7 +338,7 @@ services:
       file: common-config.yml
 
   loans1:
-    image: baotuyloan1/loans:250116
+    image: baotuyloan1/loans:250121
     #    if you don't provide container_name, a random name will given to your container by the Docker server
     container_name: loans-ms1
     healthcheck:
@@ -354,6 +357,7 @@ services:
       SPRING_DATASOURCE_URL: jdbc:mysql://loansdb:3306/loansdb
       #      convey what is a service name to the Opentelemetry library
       OTEL_SERVICE_NAME: "loans"
+      SPRING_RABBITMQ_HOST: "rabbit"
     extends:
       file: common-config.yml
       service: microservice-eureka-config
@@ -419,7 +423,7 @@ services:
       OTEL_SERVICE_NAME: configserver
 
   accounts:
-    image: baotuyloan1/accounts:250116
+    image: baotuyloan1/accounts:250121
     #    if you don't provide container_name, a random name will given to your container by the Docker server
     container_name: accounts-ms
     healthcheck:
@@ -441,6 +445,7 @@ services:
       SPRING_DATASOURCE_URL: jdbc:mysql://accountsdb:3306/accountsdb
       #      convey what is a service name to the Opentelemetry library
       OTEL_SERVICE_NAME: "accounts"
+      SPRING_RABBITMQ_HOST: "rabbit"
     depends_on:
       cardsdb:
         condition: service_healthy
@@ -473,7 +478,7 @@ services:
   #        condition: service_healthy
 
   loans:
-    image: baotuyloan1/loans:250116
+    image: baotuyloan1/loans:250121
     #    if you don't provide container_name, a random name will given to your container by the Docker server
     container_name: loans-ms
     healthcheck:
@@ -492,6 +497,7 @@ services:
       SPRING_DATASOURCE_URL: jdbc:mysql://loansdb:3306/loansdb
       #      convey what is a service name to the Opentelemetry library
       OTEL_SERVICE_NAME: "loans"
+      SPRING_RABBITMQ_HOST: "rabbit"
     extends:
       file: common-config.yml
       service: microservice-eureka-config
@@ -500,7 +506,7 @@ services:
         condition: service_healthy
 
   cards:
-    image: baotuyloan1/cards:250116
+    image: baotuyloan1/cards:250121
     #    if you don't provide container_name, a random name will given to your container by the Docker server
     container_name: cards-ms
     healthcheck:
@@ -522,6 +528,7 @@ services:
       SPRING_DATASOURCE_URL: jdbc:mysql://cardsdb:3306/cardsdb
       #      convey what is a service name to the Opentelemetry library
       OTEL_SERVICE_NAME: "cards"
+      SPRING_RABBITMQ_HOST: "rabbit"
     depends_on:
       cardsdb:
         condition: service_healthy
@@ -552,6 +559,18 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
+
+  message:
+    image: "baotuyloan1/message:250121"
+    container_name: message-ms
+    depends_on:
+      rabbit:
+        condition: service_healthy
+    environment:
+      SPRING_RABBITMQ_HOST: "rabbit"
+    extends:
+      file: common-config.yml
+      service: network-deploy-service
 
 # we create a network with the name easybank and the driver is bridge.
 # the reason why we need to create a network is because we want to make sure all our containers are able to communicate with each other.

@@ -21,8 +21,19 @@ spring:
 #    import:
 #      - "application_qa.yml"
 #      - "application_prod.yml"
+  cloud:
+    function:
+      definition: updateCommunication
+    stream:
+      bindings:
+        sendCommunication-out-0:
+          destination: send-cards
+        updateCommunication-in-0:
+          destination: cards-sent
+          group: ${spring.application.name}
 
-#build:
+
+  #build:
 #  version: "3.0"
 #
 #cards:

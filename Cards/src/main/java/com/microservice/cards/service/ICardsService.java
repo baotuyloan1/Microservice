@@ -31,4 +31,11 @@ public interface ICardsService {
      */
     boolean deleteCard(String mobileNumber);
 
+    /**
+     *
+     * @param cardId - Long
+     * @return boolean indicating if the update of communication status is successful or not
+     */
+    boolean updateCommunicationStatus(Long cardId);
+
 }

@@ -1655,3 +1655,140 @@ Spring Cloud Function features:
 
 
 The Spring Cloud Function is the best suitable for event driven architecture because these functions give flexibility to use to take our business logic wherever we want.
+
+
+# Steps to create functions using Spring Cloud Functions:
+
+1. Initialize a spring cloud function project: Start by creating a new Spring Boot project using your preferred IDE or by using Spring Initializer (https://start.spring.io/). 
+Include the spring-cloud-function-context maven dependency.
+2. Implement the business logic using functions
+   - To enable Spring Cloud Function to recognize our functions, we need to register them as beans.
+   - Proceed with annotating the MessageFunctions class as @Configuration and the methods email() & sms() as @Bean to achieve this.
+3. Composing functions: If our scenario needs multiple functions to be executed, then we need to compose them otherwise we can use them as individual as well. 
+   - Composing functions can be achieved by defining a property in application.yml like shown below:
+   ```yaml
+   spring:
+     cloud:
+       function:
+         definition: email|sms
+    ```
+   
+We can now instruct Spring Cloud Function to use these functions as building blocks and generate a new function derived
+
+## Why to use Spring Cloud Stream?
+
+Spring Cloud Stream is a framework designed for creating scalable, even-driven, and streaming applications.
+Its core principle is to allow developers to focus on the business logic while the framework takes care of infrastructure-related tasks, such as integrating with a message broker.
+
+Spring Cloud Stream leverages the native capabilities of each message broker, while also providing an abstract layer to ensure a consistent experience regardless of the underlying middleware.
+By just adding a dependency to your project, you can have functions automatically connected to an external message broker.
+The beauty of this approach is that you don't need to modify any application code; you simply adjust the configuration in the application.yaml file.
+
+THe framework supports integrations with RabbitMQ, Apache Kafka, Kafka Streams, and Amazon Kinesis.
+There are also integrations maintained by partners for Google PubSub, Solace PubSub+, Azure Event Hubs and Apache RocketMQ.
+
+
+The core building blocks of Spring Cloud Stream are:
+1. Destination Binders: Components responsible to provide integration with the external messaging systems.
+2. Destination Bindings: Bridge between the external messaging systems and application code (producer/consumer) provided by the end user.
+3. Message: The canonical data structure used by producers and consumers to communicate with Destination Binders (and thus other applications via external messaging systems).
+
+
+![img_89.png](img_89.png)
+
+Start RabbitMQ using docker
+```terminal
+docker run -it --rm --name rabbitmq -p 5672:5672 -p 15672:15672 rabbitmq:4.0-management
+```
+
+## Steps to create bindings using Spring Cloud Stream
+
+
+1. Add the Stream related dependencies: Add the maven dependencies spring cloud-stream, spring-cloud-stream-binder-rabbit inside pom.xml of message service where we defined functions.
+2. Add the stream binding and rabbitmq properties inside application.yaml of message service.
+   ```yaml
+    spring:
+    application:
+    name: "message"
+    cloud:
+    function:
+      definition: email|sms
+    stream:
+      bindings:
+        email|sms-in-0: #binding name (this is default naming convention if not specified)
+          destination: send-communication # queue name = this destination + the group belown
+          group: ${spring.application.name} # if I don't mention this group property, then my rabbitmq is going to append some randomly generated value to my destination names to my channel names and queue names.
+        email|sms-out-0:
+          destination: communication-sent
+    rabbitmq:
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest
+    connection-timeout: 10s
+    ```
+We need to define input binding for each function accepting input data, and an output binding for each function returning output data.
+Each binding can have a logical name following the below convention. Unless you use partitions (for example, with Kafka), the <index> part of the name will always be 0. The <functionname> is computed from the value of the spring.cloud.function.definition property.
+
+Input binding: <functionName> +-in-+<index>
+Output binding: <functionName> +-out-+<index>
+
+The binding names exist only in Spring Cloud Stream and RabbitMQ doesn't know about them.
+So to map between the Spring Cloud Stream binding and RabbitMQ, we need to define the destination which will be the exchange inside the RabbitMQ.
+Group is typically application name, so that all the instance of the application can point to the same exchange and queue.
+
+The queues will be created inside RabbitMQ based on the queue-naming strategy (<destination>.<group>) includes a parameter called consumer group. 
+
+## The steps for event producing and consuming in accounts microservice.
+
+1. Autowire StreamBridge class: StreamBridge is a class inside Spring Cloud Stream which allows user to send data to an output binding.
+To produce the event, autowire the StreamBridge class into the class from where you want to produce an event.
+2. Use send () of StreamBridge to produce an event like shown below:
+    ```java
+      @Override
+      public void createAccount(CustomerDto customerDto) {
+          Customer customer = CustomerMapper.mapToCustomer(customerDto, new Customer());
+          Optional<Customer> optionalCustomer = customerRepository.findByMobileNumber(customer.getMobileNumber());
+  
+          if (optionalCustomer.isPresent()) {
+              throw new CustomerAlreadyExistsException("Customer already registered with give mobile number " + customerDto.getMobileNumber());
+          }
+  
+          Customer savedCustomer = customerRepository.save(customer);
+          Account savedAccounts = accountsRepository.save(createNewAccount(savedCustomer));
+          sendCommunication(savedAccounts, savedCustomer);
+      }
+  
+  
+      private void sendCommunication(Account account, Customer customer){
+          var accountMsgDto = new AccountsMsgDto(account.getAccountNumber(), customer.getName(), customer.getEmail(), customer.getMobileNumber() );
+          log.info("Sending Communication request for the details: {}", accountMsgDto);
+          var result = streamBridge.send("sendCommunication-out-0", accountMsgDto);
+          log.info("Is the Communication request successfully triggered?: {}", result);
+      }
+    ```
+
+3. Create a function to accept the event: Inside account microservice, we need to create a function that accepts the event and update the communication status inside the DB. 
+
+    ```java
+    @Configuration
+    public class AccountsFunctions {
+    
+        private static final Logger log = LoggerFactory.getLogger(AccountsFunctions.class);
+    
+        @Bean
+        public Consumer<Long> updateCommunication(IAccountService accountService){
+            return accountNumber -> {
+                log.info("Updating Communication status for the account number: {}", accountNumber.toString());
+                accountService.updateCommunicationStatus(accountNumber);
+            };
+        }
+    }
+
+    ```
+
+4. Add the stream binding and rabbitmq properties inside application.yml to account service.
+
+When Account microservice wants to produce an event using StreamBridge, we should have a supporting stream binding and destination.
+We need to define input binding for the function *updateCommunication* to accept the event using the destination *communication-sent*.
+So when the message service push a event input the exchange of communication-send, the same will be processed by the function updateCommunication.

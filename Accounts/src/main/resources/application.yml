@@ -39,16 +39,31 @@ spring:
 #    - (+84) 788 049 042
 #    - (+84) 123 456 789
   rabbitmq:
-    host: "localhost"
+    host: localhost
     port: 5672
+#    event-driven
+    username: guest
+    password: guest
+    connection-timeout: 10s
+  #    configuration
     stream:
       username: "guest"
       password: "guest"
-#      enable circuitbreaker
+
+  #      enable circuitbreaker
   cloud:
     openfeign:
       circuitbreaker:
         enabled: true
+    function:
+      definition: updateCommunication # ; for individual functions, | for combining functions
+    stream:
+      bindings:
+        updateCommunication-in-0:
+          destination: accounts-sent # queue name
+          group: ${spring.application.name}
+        sendCommunication-out-0: #binding name
+          destination: send-accounts #exchange name
 
 management:
   endpoints:

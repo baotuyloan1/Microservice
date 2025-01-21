@@ -33,6 +33,16 @@
 	</properties>
 	<dependencies>
 
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-stream</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-stream-binder-rabbit</artifactId>
+		</dependency>
+
 		<!--        during compilation, I don't need this open telementry-->
 		<!--        only when I'm trying to run my application at runtime-->
 		<dependency>
@@ -128,7 +138,7 @@
 				<version>3.3.2</version>
 				<configuration>
 					<to>
-						<image>baotuyloan1/${project.artifactId}:250116</image>
+						<image>baotuyloan1/${project.artifactId}:250121</image>
 					</to>
 				</configuration>
 			</plugin>

@@ -29,4 +29,6 @@ public class Cards extends BaseEntity {
     private int amountUsed;
 
     private int availableAmount;
+
+    private Boolean communicationSw;
 }

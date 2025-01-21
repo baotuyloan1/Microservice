@@ -2,6 +2,7 @@ package com.microservice.cards.service.impl;
 
 import com.microservice.cards.constants.CardsConstants;
 import com.microservice.cards.dto.CardsDto;
+import com.microservice.cards.dto.CardsMsgDto;
 import com.microservice.cards.entity.Cards;
 import com.microservice.cards.exception.CardAlreadyExistsException;
 import com.microservice.cards.exception.ResourceNotFoundException;
@@ -9,6 +10,9 @@ import com.microservice.cards.mapper.CardsMapper;
 import com.microservice.cards.repository.CardsRepository;
 import com.microservice.cards.service.ICardsService;
 import lombok.AllArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.cloud.stream.function.StreamBridge;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -19,7 +23,9 @@ import java.util.Random;
 public class CardsServiceImpl implements ICardsService {
 
     private CardsRepository cardsRepository;
+    private StreamBridge streamBridge;
 
+    private static final Logger log = LoggerFactory.getLogger(CardsServiceImpl.class);
 
     /**
      * @param mobileNumber - Mobile Number of the Customer
@@ -30,7 +36,15 @@ public class CardsServiceImpl implements ICardsService {
         if(optionalCards.isPresent()){
             throw new CardAlreadyExistsException("Card already registered with given mobileNumber "+mobileNumber);
         }
-        cardsRepository.save(createNewCard(mobileNumber));
+        Cards cards = cardsRepository.save(createNewCard(mobileNumber));
+        sendCommunication(cards);
+    }
+
+    private void sendCommunication(Cards cards){
+        CardsMsgDto cardsMsgDto = new CardsMsgDto(cards.getCardId(), cards.getMobileNumber(), cards.getCardNumber(), cards.getCardType(), cards.getTotalLimit(), cards.getAmountUsed(), cards.getAvailableAmount());
+        log.info("Sending Communication request for the details: {}", cardsMsgDto);
+        var result = streamBridge.send("sendCommunication-out-0", cardsMsgDto);
+        log.info("Is the Communication request successfully triggered?: {}", result);
     }
 
     /**
@@ -84,5 +98,23 @@ public class CardsServiceImpl implements ICardsService {
         );
         cardsRepository.deleteById(cards.getCardId());
         return true;
+    }
+
+    /**
+     * @param cardId - Long
+     * @return boolean indicating if the update of communication status is successful or not
+     */
+    @Override
+    public boolean updateCommunicationStatus(Long cardId) {
+        boolean isUpdated = false;
+        if (cardId != null){
+            Cards cards = cardsRepository.findById(cardId).orElseThrow(
+                    () -> new ResourceNotFoundException("Cards", "cardId", String.valueOf(cardId))
+            );
+            cards.setCommunicationSw(true);
+            cardsRepository.save(cards);
+            isUpdated = true;
+        }
+        return isUpdated;
     }
 }

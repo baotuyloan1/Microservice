@@ -38,6 +38,17 @@ spring:
     stream:
       username: "guest"
       password: "guest"
+  cloud:
+    function:
+      definition: updateCommunication
+    stream:
+      bindings:
+        sendCommunication-out-0:
+          destination: send-loans
+        updateCommunication-in-0:
+          destination: loans-sent
+          group: ${spring.application.name}
+
 
 
 management:

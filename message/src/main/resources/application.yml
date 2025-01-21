@@ -7,4 +7,27 @@ spring:
   cloud:
     function:
 #      combine both email and sms into a single function
-      definition: email|sms
+      definition: emailAccount|smsAccount;emailCards|smsCards;emailLoans|smsLoans
+    stream:
+      bindings:
+        emailAccount|smsAccount-in-0: #binding name (this is default naming convention if not specified)
+          destination: send-accounts # queue name = this destination + the group belown
+          group: ${spring.application.name} # if I don't mention this group property, then my rabbitmq is going to append some randomly generated value to my destination names to my channel names and queue names.
+        emailAccount|smsAccount-out-0:
+          destination: accounts-sent
+        emailCards|smsCards-in-0:
+          destination: send-cards
+          group: ${spring.application.name}
+        emailCards|smsCards-out-0:
+          destination: cards-sent
+        emailLoans|smsLoans-in-0:
+          destination: send-loans
+          group: ${spring.application.name}
+        emailLoans|smsLoans-out-0:
+          destination: loans-sent
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest
+    connection-timeout: 10s
