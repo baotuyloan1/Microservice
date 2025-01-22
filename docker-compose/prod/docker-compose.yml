@@ -1,10 +1,34 @@
 services:
 
+  kafka:
+    image: docker.io/bitnami/kafka:3.9
+    ports:
+      - "9092:9092"
+    volumes:
+      - "kafka_data:/bitnami"
+    environment:
+      # KRaft settings
+      - KAFKA_CFG_NODE_ID=0
+      - KAFKA_CFG_PROCESS_ROLES=controller,broker
+      - KAFKA_CFG_CONTROLLER_QUORUM_VOTERS=0@kafka:9093
+      # Listeners
+      - KAFKA_CFG_LISTENERS=PLAINTEXT://:9092,CONTROLLER://:9093
+      - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://:9092
+      - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
+      - KAFKA_CFG_CONTROLLER_LISTENER_NAMES=CONTROLLER
+      - KAFKA_CFG_INTER_BROKER_LISTENER_NAME=PLAINTEXT
+    extends:
+      file: common-config.yml
+      service: network-deploy-service
+
+
   keycloak:
     image: quay.io/keycloak/keycloak:26.0.8
     container_name: keycloak
     ports:
       - "7080:8080"
+    volumes:
+      - keycloak_data:/opt/keycloak/data
     environment:
       KC_BOOTSTRAP_ADMIN_USERNAME: "admin"
       KC_BOOTSTRAP_ADMIN_PASSWORD: "admin"
@@ -271,7 +295,7 @@ services:
 
 
   accounts1:
-    image: baotuyloan1/accounts:250121
+    image: baotuyloan1/accounts:250122
     #    if you don't provide container_name, a random name will given to your container by the Docker server
     container_name: accounts-ms1
     healthcheck:
@@ -294,13 +318,13 @@ services:
 #      convey what is a service name to the Opentelemetry library
       OTEL_SERVICE_NAME: "accounts"
       SPRING_RABBITMQ_HOST: "rabbit"
-
+      SPRING_CLOUD_STREAM_KAFKA_BINDER_BROKERS: "kafka:9092"
     depends_on:
       cardsdb:
         condition: service_healthy
 
   accounts2:
-    image: baotuyloan1/accounts:250121
+    image: baotuyloan1/accounts:250122
     #    if you don't provide container_name, a random name will given to your container by the Docker server
     container_name: accounts-ms2
     healthcheck:
@@ -323,6 +347,7 @@ services:
       #      convey what is a service name to the Opentelemetry library
       OTEL_SERVICE_NAME: "accounts"
       SPRING_RABBITMQ_HOST: "rabbit"
+      SPRING_CLOUD_STREAM_KAFKA_BINDER_BROKERS: "kafka:9092"
     depends_on:
       cardsdb:
         condition: service_healthy
@@ -423,7 +448,7 @@ services:
       OTEL_SERVICE_NAME: configserver
 
   accounts:
-    image: baotuyloan1/accounts:250121
+    image: baotuyloan1/accounts:250122
     #    if you don't provide container_name, a random name will given to your container by the Docker server
     container_name: accounts-ms
     healthcheck:
@@ -446,6 +471,7 @@ services:
       #      convey what is a service name to the Opentelemetry library
       OTEL_SERVICE_NAME: "accounts"
       SPRING_RABBITMQ_HOST: "rabbit"
+      SPRING_CLOUD_STREAM_KAFKA_BINDER_BROKERS: "kafka:9092"
     depends_on:
       cardsdb:
         condition: service_healthy
@@ -561,13 +587,14 @@ services:
         condition: service_healthy
 
   message:
-    image: "baotuyloan1/message:250121"
+    image: "baotuyloan1/message:250122"
     container_name: message-ms
     depends_on:
       rabbit:
         condition: service_healthy
     environment:
       SPRING_RABBITMQ_HOST: "rabbit"
+      SPRING_CLOUD_STREAM_KAFKA_BINDER_BROKERS: "kafka:9092"
     extends:
       file: common-config.yml
       service: network-deploy-service
@@ -578,3 +605,9 @@ services:
 networks:
   easybank:
     driver: "bridge"
+
+volumes:
+  kafka_data:
+    driver: local
+  keycloak_data:
+    driver: local

@@ -45,6 +45,11 @@
             <artifactId>spring-cloud-stream-binder-rabbit</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-stream-binder-kafka</artifactId>
+        </dependency>
+
 
         <!--        during compilation, I don't need this open telementry-->
         <!--        only when I'm trying to run my application at runtime-->

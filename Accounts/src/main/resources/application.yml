@@ -64,6 +64,12 @@ spring:
           group: ${spring.application.name}
         sendCommunication-out-0: #binding name
           destination: send-accounts #exchange name
+#          kafka binder
+      kafka:
+        binder:
+          brokers: # a list of elements under these brokers
+          - localhost:9092
+      default-binder: kafka
 
 management:
   endpoints:

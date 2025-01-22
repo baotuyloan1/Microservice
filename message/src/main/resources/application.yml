@@ -25,6 +25,11 @@ spring:
           group: ${spring.application.name}
         emailLoans|smsLoans-out-0:
           destination: loans-sent
+      kafka:
+        binder:
+          brokers: # a list of elements under these brokers
+            - localhost:9092
+      default-binder: kafka
   rabbitmq:
     host: localhost
     port: 5672

@@ -32,15 +32,7 @@
 	</properties>
 	<dependencies>
 
-		<dependency>
-			<groupId>org.springframework.cloud</groupId>
-			<artifactId>spring-cloud-stream</artifactId>
-		</dependency>
 
-		<dependency>
-			<groupId>org.springframework.cloud</groupId>
-			<artifactId>spring-cloud-stream-binder-rabbit</artifactId>
-		</dependency>
 
 <!--		main dependencies-->
 <!--		enable spring cloud stream, used for building message-driven -->
@@ -55,6 +47,12 @@
 		<dependency>
 			<groupId>org.springframework.cloud</groupId>
 			<artifactId>spring-cloud-stream-binder-rabbit</artifactId>
+		</dependency>
+
+
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-stream-binder-kafka</artifactId>
 		</dependency>
 
 <!--		end of main dependencies-->
@@ -95,7 +93,7 @@
 				<version>3.3.2</version>
 				<configuration>
 					<to>
-						<image>baotuyloan1/${project.artifactId}:250121</image>
+						<image>baotuyloan1/${project.artifactId}:250122</image>
 					</to>
 				</configuration>
 			</plugin>

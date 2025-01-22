@@ -1792,3 +1792,90 @@ To produce the event, autowire the StreamBridge class into the class from where 
 When Account microservice wants to produce an event using StreamBridge, we should have a supporting stream binding and destination.
 We need to define input binding for the function *updateCommunication* to accept the event using the destination *communication-sent*.
 So when the message service push a event input the exchange of communication-send, the same will be processed by the function updateCommunication.
+
+
+
+# Apache Kafka And RabbitMQ
+
+## Differences between Apache Kafka and RabbitMQ
+
+- Design: Kafka is a distributed event streaming platform, while RabbitMQ is a message broker. This means that Kafka is designed to handle large volumes of data, while RabbitMQ is designed to handle smaller volumes of data with more complex routing requirements.
+- Data retention: Kafka stores data on disk, while RabbitMQ stores data in memory. This means that Kafka can retain data for longer periods of time, while RabbitMQ is more suitable for applications that require low latency.
+- Performance: Kafka is generally faster than RabbitMQ, especially for large volumes of data. However, RabbitMQ can be higher performance for applications with complex routing requirements.
+- Scalability: Kafka is highly scalable, while RabbitMQ is more limited in its scalability. This is because Kafka can be scaled horizontally to any extent by adding more brokers to the cluster.
+
+## Introduction to Apache Kafka
+
+- Producers: Producers are responsible for publishing messages to Kafka topics. They write messages to a specific topic, and Kafka appends these messages to the topic's log.
+- Topics: Kafka organizes data into topics. A topic is a particular stream of data that can be divided into partitions. Each message within a topic is identified by its offset.
+- Brokers: Brokers are the Kafka servers that manage the storage and replication of topics. They are responsible for receiving messages from producers, assigning offsets to messages, and serving messages to consumers.
+- Partition: Topics can be divided into multiple partitions, allowing for parallel processing and load balancing. Each partition is ordered, immutable sequence of messages, and each message within a partition has a unique offset.
+- Offsets: Offsets are unique identifiers assigned to each message in a partition. They are used to track the progress of consumers. Consumers can control their offsets, enabling them to rewind or skip messages based on their needs.
+- Replication: Kafka allows topics to be replicated across multiple brokers to ensure fault tolerance. Replication provides data redundancy, allowing for failover and high availability.
+- Consumers: Consumers read messages from Kafka topics. They subscribe to one or more topics and consume messages by reading from specific partitions within those topics. Each consumer maintains its offset to track its progress in topic.
+- Consumer Groups: Consumers can be organized into consumer groups. Each message published to a topic is delivered to only one consumer within each group. This enables parallel processing of messages across multiple consumers.
+- Streams: Kafka Streams is a client library that enables stream processing within Kafka. It allows you to build applications that consume, transform, and produce data in real-time.
+
+![img_90.png](img_90.png)
+
+- A Kafka Cluster can have any number of producers, consumers and brokers. For a production setup, at least three brokers are recommended.
+- A Kafka broker can have any number of topics. Topic is a category under which producers and write and interested, authorized consumers can read data. For example, we can have topics like sendCommunication, dispatchOrder, purgeData...
+- Inside each topic, we can have any number of partitions. Kafka producers can handle enormous amount of data, it is not possible to store in a single server(broker). Therefore, a topic will be partitioned into multiple parts and distributed across multiple brokers.
+- Offsets is a sequence id assigned to a messages as they get stores inside a partition. The offset number starts from 0 and follows by 1,2,3... Once offset id is assigned, it will never change. These are similar to sequence ids inside the DB tables.
+
+*Installation tutorial: https://youtu.be/aH3-UjIrnRs?si=z78XX8OFYpS94ldt*
+
+
+## Step to use Apache Kafka in the place of RabbitMQ:
+
+1. Add maven dependencies: Add the maven dependency spring-cloud-stream-binder-kafka in the place of spring-cloud-stream-binder-rabbitmq dependency.
+2. Add Kafka related properties inside the application.yml file of both accounts and message service.
+    ```yaml
+   spring:
+    application:
+    name: "accounts"
+   cloud:
+    function:
+      definition: updateCommunication # ; for individual functions, | for combining functions
+    stream:
+      bindings:
+        updateCommunication-in-0:
+          destination: accounts-sent # queue name
+          group: ${spring.application.name}
+        sendCommunication-out-0: #binding name
+          destination: send-accounts #exchange name
+      kafka:
+        binder:
+          brokers: # a list of elements under these brokers
+          - localhost:9092   
+    ```
+   
+   ```yaml
+   spring:
+    application:
+    name: "message"
+    cloud:
+    function:
+      definition: emailAccount|smsAccount;emailCards|smsCards;emailLoans|smsLoans
+    stream:
+      bindings:
+        emailAccount|smsAccount-in-0: #binding name (this is default naming convention if not specified)
+          destination: send-accounts # queue name = this destination + the group belown
+          group: ${spring.application.name} # if I don't mention this group property, then my rabbitmq is going to append some randomly generated value to my destination names to my channel names and queue names.
+        emailAccount|smsAccount-out-0:
+          destination: accounts-sent
+        emailCards|smsCards-in-0:
+          destination: send-cards
+          group: ${spring.application.name}
+        emailCards|smsCards-out-0:
+          destination: cards-sent
+        emailLoans|smsLoans-in-0:
+          destination: send-loans
+          group: ${spring.application.name}
+        emailLoans|smsLoans-out-0:
+          destination: loans-sent
+      kafka:
+        binder:
+          brokers: # a list of elements under these brokers
+            - localhost:9092
+   ```
