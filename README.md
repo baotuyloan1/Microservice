@@ -1879,3 +1879,240 @@ So when the message service push a event input the exchange of communication-sen
           brokers: # a list of elements under these brokers
             - localhost:9092
    ```
+
+
+# CONTAINER ORCHESTRATION
+
+- Automating the deployments, Rollouts & Rollbacks?
+- Making our services are self-healing?
+- Autoscaling our services?
+
+→ Kubernetes is an open-source container orchestration platform that automates deployment, scaling, and management of containerized applications.
+It was originally developed by Google and is now maintained by the Cloud Native Computing Foundation (CNCF).
+
+## WHAT IS KUBERNETES?
+
+- It is going to help you run distributed systems like cloud native applications or microservices.
+- Taking care of automated scaling and handling the fail-over for your application.
+- Providing deployment patterns that will ensure zero downtime for your applications.
+- Kubernetes is also capable of acting as a service discovery agent and provides load balancing.
+- With the help of Eureka Server, we are doing client side load balancing. 
+- Whereas with the help of Kubernetes, we can get rid of Eureka Server, and we can handle the load balancing to the Kubernetes. With that, we are going to use server side load balancing.
+- Kubernetes is also capable of performing container and storage orchestration.
+- With the help of Kubernetes, we can control any number of containers along with their storage requirements.
+- It is also capable of automated rollouts and rollbacks.
+- It also provides self-healing.
+- We can also configure properties and secrets that are required for our microservices.
+
+## KUBERNETES INTERNAL ARCHITECTURE:
+
+Inside the cluster will have a set of servers or virtual machines which are going to work together to deliver a desired ouput to the end user.
+
+Whenever you use Docker compose, you are going to deploy all your containers inside a single server. 
+But in real production applications, you may have hundreds of microservices.
+We cannot deploy all our hundreds of microservices with the help of Docker compose in a single server.
+Instead, we want to build a multi-distributed environment where we can deploy our microservices in various servers are nodes inside a cluster.
+On top of that, your Docker or Docker compose is not capable of automatic deployments, rollouts, scaling.
+Usually a Kubernetes cluster will have multiple nodes. There are two types of nodes: Master Node and Worker Node.
+Master Node is responsible for controlling and maintaining your entire Kubernetes cluster.
+Worker Nodes are responsible to handle the traffic that we get towards our microservices.
+Inside a Master node, there is a great component, which is Kube API server.
+This Kube API server is going to expose some APIs using it anyone from outside Kubernetes cluster can interact with the master node.
+Using the same API server only the master nodes and worker nodes can communicate with each other.
+
+![img_91.png](img_91.png)
+
+There are two approaches that we can follow whenever we want to interact with the Kubernetes cluster. 
+- Using Admin UI of Kubernetes.
+- Using the kubectl CLI. From your CLI terminal, you can execute some kubectl commands and these commands will be input the Kube API server.
+
+With the help of YAML configurations, you can always provide some instructions to your Kubernetes. 
+All those configurations as an input details inside a YAML configuration to the master node with the help of admin UI or kubectl CLI.
+These commands that we can give from outside of the Kubernetes cluster are going to be received by the Kube API server.
+Once my Kube API server receives instructions though kubectl CLI or admin UI, it is going to read the instructions. What is the end user is trying to do? Whether he wants to create a deployment or whether he wants to do some autoscaling.
+It is going to give those instructions to the scheduler.
+
+*API server*
+
+THe API server is the primary interface for interacting with the Kubernetes cluster. It exposes the Kubernetes API, which allows users and other components to communication with the cluster. 
+All administrative operations and control commands are sent to the API server, which then processes and validates them.
+
+*Scheduler*
+
+Scheduler will understand what are the requirements that it received from the Kube API server and based upon the requirements it is going to identify under which worker node it has to do a deployment.
+Suppose if my end user gave an instructions to the master node saying that I want to deploy my accounts to microservices.
+In this scenario, the Kube API server will give these instructions to the scheduler. The scheduler is a component that is responsible to identify under which worker node, the deployment of accounts microservice has to be done.
+Behind the scenes, it will do a lot of calculations like which worker node has bandwidth, which worker node is super busy.
+By considering all these calculations, it is going to identify one of the worker nodes present inside the Kubernetes cluster.
+There may have any number of worker nodes inside the Kubernetes cluster.
+Once my scheduler identifies under which worker node, it has to do the account microservices deployment.
+It is going to give the same instructions back to the Kube API server and from Kube API server it will reach to the corresponding worker node about the deployment of the accounts microservice.
+→  The scheduler is responsible for placing Pods onto available nodes in the cluster. It takes into account factors like resource requirements and other constraints to make intelligent decisions about which node to assign a Pod to.
+→ The scheduler continuously monitors the cluster and ensures that Pods are distributed optimally.
+
+*Control Manager*
+
+Maybe after a few days or maybe after few hourse, your container may have some problems.
+So the controller manager is responsibility to track the containers and worker nodes available inside the cluster.
+If any of the worker nodes or container is having some health issues, this controller manager is going to make sure it is bringing new worker nodes or new containers in the place of problematic containers or worker nodes.
+In simple words, controller manager always have an input value saying that this is the desired state of my Kubernetes cluster.
+Inside my Kubernetes cluster, I always want to make sure I have three instances of accounts microservice running always.
+So my controller manager regularly keeps health check of these three running instances of accounts microservices.
+If any of the worker nodes or container has issues, it is going to match the desired state.
+If one of the containers is having some problems, my Control Manager is going to kill the container which has some problems and in the same place it is oging to bring the new instance of accounts microservices.
+It will always try to match with the desired state that it received from the end user with the actual state present inside the Kubernetes cluster.
+→ The control manager maintains the cluster. It handles node failures, replicates components, maintains the correct number of pods, etc. It constantly tries to keep the system in the desired state by comparing it with the current state of the system.
+
+
+*Etcd*
+
+The etcd as a brain of our Kubernetes cluster. Because this etcd is going to act as a database or a storage system for your Kubernetes cluster.
+Inside this etcd only all the information related to your Kubernetes cluster is going to stored as a key value pair.
+For example, if my controller manager at any point has some questions like how many replicas it has to maintain about accounts microservice.
+It can always connect with the etcd to understand what is the desired state that we initially received from the end user.
+The Kube API server when it receives the instructions from the end user with the help of CLI or admin UI, it is going to make an entry into the etcd.
+→ etcd is a distributed key-value store that servers as the cluster's primary data store. It stores the configuration data and the desired state of the system, including information about Pods, Services, ReplicationController, and more. The API server interacts with etcd to read and write cluster data.
+
+## Worker nodes 
+
+*Kubelet*
+
+Kubelet is an agent running inside all your worker nodes. Using these Kubelet Only, my master node is going to connect with the worker node. It is going to provide the instructions with the help of Kube API server.
+My master node has to give instructions to the worker node saying that please deploy this account microservice with the replica of three.
+All instructions the worker nodes are going to receive with the help of Kubelet.
+→ Kubelet is an agent that runs on each worker node and communicates twith the control plan components.
+→ It receives instructions from the control plane, such as Pod creation and deletion requests, and ensures that the desired state of Pods is maintained on the node.
+→ Kubelet is responsible for starting, stopping and monitoring containers based on Pod specifications.
+
+Since we are going to deploy all our microservices in the form of containers, we need to make sure that there is some container runtime installed inside the worker node.
+When you try to set up Kubernetes cluster, all your worker nodes they are going to have that Docker installed inside them.
+
+Pod is the smallest deployment unit inside the Kubernetes.
+We cannot deploy our containers directly into the worker nodes. Inside this pod only the actual containers of the microservices are going to be deployed.
+Suppose if you are trying to deploy multiple microservices into your same worker node to provide that isolation from other microservices, we are going to have a concept of pods.
+Inside these parts only the containers will be deployed.
+Usually most of the time a pod will have a single container.
+SUppose you are trying to deploy your accounts microservice and cards microservice and loans microservice.
+All these microservices are going to be deployed independently in different parts.
+Multiple microservices will never be deployed inside a single pod. 
+Inside a pod, only a specific microservice or a specific application only allowed.
+However, sometimes you may deploy multiple containers inside a pod is that your container (loans, cards, accounts) may need some helper container, or it may need some utility container to perform its job.
+Such helper containers we can deploy inside the same pod where we have the main container.
+This kind of deploying a helper container along with the main container inside a pod is called sidecar pattern.
+
+To expose your container to the outside world or to the other containers inside the same cluster, Kubernetes is going to use a component called kube-proxy.
+With the help of kube-proxy, all the containers are available inside the worker nodes.
+They are going to expose themselves to the outside world.
+Or they can also restrict themselves that the communication they are going to accept only within the cluster.
+
+You can have any number of master nodes and any number of worker nodes. 
+A single master node cannot handle any number of worker nodes.
+If you have large number of worker nodes, then obviously, we need more number of master nodes.
+
+
+# Setup a local Kubernetes cluster using Docker Desktop
+
+https://docs.docker.com/desktop/features/kubernetes/
+
+![img_92.png](img_92.png)
+
+The Kubernetes server runs as a single-node cluster within a Docker container. (a Node is a node master and it is also a node worker)
+
+Kubernetes integration automatically installs the Kubernetes CLI command at /usr/local/bin/kubectl on Mac and at C:\Program Files\Docker\Docker\Resources\bin\kubectl.exe on Windows. This location may not be in your shell's PATH variable, so you may need to type the full path of the command or add it to the PATH.
+
+To deploy the Dashboard UI : https://kubernetes.io/docs/tasks/access-application-cluster/web-ui-dashboard/
+
+![img_93.png](img_93.png)
+
+In order to execute these commands first we need to make sure we installed the helm inside our local system
+
+In order to install the help, install the Chocolatey package manager for Windows: https://chocolatey.org/install
+```cmd
+Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
+```
+
+
+This command will install Kubernetes Dashboard inside my local Kubetnetes cluster.
+```cmd
+helm upgrade --install kubernetes-dashboard kubernetes-dashboard/kubernetes-dashboard --create-namespace --namespace kubernetes-dashboard
+```
+To access Dashboard run:
+```cmd
+kubectl -n kubernetes-dashboard port-forward svc/kubernetes-dashboard-kong-proxy 8443:443
+```
+
+When access the Dashboard UI, you will need a Bearer token
+https://localhost:8443
+
+To get Bearer token:
+1. https://kubernetes.io/docs/tasks/access-application-cluster/web-ui-dashboard/
+2. https://github.com/kubernetes/dashboard/blob/master/docs/user/access-control/creating-sample-user.md
+
+![img_94.png](img_94.png)![img_95.png](img_95.png)
+
+```yaml
+apiVersion: v1 # use the version one of API to create a service account.
+kind: ServiceAccount # a predefined object. The Kubernates is going to create a ServiceAccount.
+metadata:
+  name: admin-user # name of the service account. This is very similar to your username.
+  namespace: kubernetes-dashboard # It is a kind of boundary or an isolated area inside the cluster. By default, if you don't mention the namespace where the ServiceAccount has to be created. The Kubernetes cluster is going to create it inside the default namespace.
+```
+
+Provide these configurations to the Kubernetes cluster.
+```cmd
+kubectl apply -f dashboard-adminuser.yaml
+```
+
+We need to provide privileges to this account with the help of this cluster role binding.
+
+```yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: admin-user # the name of this cluster role binding
+roleRef: # a cluster role that you want to bind
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole # inside the Kubernetes clusters, all roles we should call it as a cluster role. That means we're trying to assign a role cluster-admin
+  name: cluster-admin # the name of the cluster role
+subjects: # which user or which service account to want to bind. We can define any number of ServiceAccount or we can define any number of user details.
+  - kind: ServiceAccount
+    name: admin-user
+    namespace: kubernetes-dashboard
+#  - kind: ServiceAccount1
+#    name: admin-user1
+#    namespace: kubernetes-dashboard1
+```
+
+Provide the above configurations to the Kubernetes cluster.
+```cmd
+kubectl apply -f dashboard-rolebinding.yaml
+```
+
+Run this command to get a token for the admin-user
+```cmd
+kubectl -n kubernetes-dashboard create token admin-user
+```
+-n: is the namespace where we have a ServiceAccount is kubernetes-dashboard.
+
+
+Getting a long-lived Bearer Token for ServiceAccount
+```yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: admin-user
+  namespace: kubernetes-dashboard
+  annotations:
+    kubernetes.io/service-account.name: "admin-user" # Crete a secret for the admin user that we have created in dashboard-adminuser.yaml
+type: kubernetes.io/service-account-token
+```
+
+Provide the above configurations to the Kubernetes cluster.
+```cmd
+kubectl apply -f secret.yaml
+```
+
+After Secret is created, we can execute the following command to get the token which is saved in the Secret:
+```cmd
+kubectl get secret admin-user -n kubernetes-dashboard -o jsonpath="{.data.token}" | base64 -d
+```
