@@ -1,0 +1,65 @@
+# https://kubernetes.io/docs/concepts/workloads/controllers/deployment/
+apiVersion: apps/v1
+kind: Deployment # Whenever we want to deploy our microservices into the Kubernetes cluster, always make sure this is Deployment
+metadata:
+  # This name can be anything. The name of the deployment. This name which we can try to search inside the Kubernetes cluster.
+  # This name will be different for each deployment.
+  # Always make sure we are giving a unique name for each deployment.
+  name: configserver-deployment
+#   these labels are very important inside the Kubernetes configurations.
+  labels:
+    app: configserver # This app configserver has to be the same in all the places.
+# spec indicates specification
+# how many replicas we want wo deploy
+# what are the container details?
+# what are the docker image details?
+# This specification is related to the deployment.
+spec:
+  replicas: 1 # deploy only a single instance of my config server
+  selector:
+    matchLabels:
+      app: configserver # we need to mention the label which we have mentioned above.
+  template: # the template instructions on how we want to deploy our microservice.
+    metadata:
+      labels:
+        app: configserver
+    # This specification is related to the template.
+    spec:
+      containers:
+      - name: configserver # name of the container
+        # The image name that Kubernetes cluster has to consider deploying your microservices.
+#         By default, whenever we don't mention the container registry information.
+#         Internally, it is going to add docker.io by default -> docker.io/baotuyloan1/configserver:250116
+#         if you have your images in some other places (not Docker Hub), then you need to mention those container registry details just before ".../baotuyloan1/configserver:250116"
+        image: baotuyloan1/configserver:250116
+        ports:
+        - containerPort: 8071
+# with this signle container information, my Kubernetes cluster will create deployment and as part of the deployment a pod will be created inside on of the worker node.
+# my pod is going to have a single container inside it.
+--- # three hyphens is used to separate the configurations as two separate YAML files.
+# Whatever I wrote in the top, all these configurations will be treated as a single YAML
+# Whatever I have mentioned below, these will be treated as a second YAML file.
+
+# exposing that container to the outside world or restricting that container only for the internal communication
+# we need to create one more object with the kind is Service.
+apiVersion: v1
+kind: Service
+metadata:
+  # whatever you have mentioned at this line, using the same name only my other microservice inside the Kubernates cluster, they are going to communicate with each other.
+#  this is going to act as a host name.
+  name: configserver # the name of the service
+spec:
+  selector:
+#    whatever specification that we are trying to define here, it will apply for an app with the name config server.
+#    the same app config server I have mentioned under the deployment labels
+#    In simple words, My Kubernetes cluster will apply all the services that I have defined here to the containers that I have created with the help of ideployment instractions with the same label configserver at line 11.
+    app: configserver
+    # use it if you want to expose your microservice to the outside world.
+    # which means to the outside of the Kubernetes cluster as well.
+  type: LoadBalancer
+  ports:
+    - protocol: TCP  # communicate over web, we need to mention the protocol as TCP
+      port: 8071 # this port will be exposed to the outside world
+      #  this port where my container is going to start internally inside the Kubernetes network.
+#      make sure the container port in the deployment is the same as this targetPort
+      targetPort: 8071

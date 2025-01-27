@@ -2116,3 +2116,173 @@ After Secret is created, we can execute the following command to get the token w
 ```cmd
 kubectl get secret admin-user -n kubernetes-dashboard -o jsonpath="{.data.token}" | base64 -d
 ```
+
+Show all the deployments inside the Kubernetes cluster
+```cmd
+kubectl get deployments
+```
+Show all the services inside the Kubernetes cluster
+```cmd
+kubectl get services
+```
+
+```cmd
+kubectl get replicaset
+```
+
+Deploy the ConfigServer with the manifest file that we have created.
+
+```cmd
+kubectl apply -f kubernetes/configserver.yaml
+```
+
+![img_96.png](img_96.png)
+
+## How to create the same kind of environment variables inside the Kubernetes cluster?
+
+1. A ConfigMap is an API object used to store non-confidential data in key-value pairs.
+2. Secret is an object that contains a small amount of sensitive data such as a password, a token, or a key.
+
+Create an object of configmap inside Kubernetes.
+```yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: easybank-configmap
+data: # at this data element, we can provide any number of environment properties with a key and value.
+  SPRING_PROFILES_ACTIVE: "prod"
+  SPRING_CONFIG_IMPORT: "optional:configserver:http://configserver:8071/"
+  ACCOUNTS_DATASOURCE_URL: "jdbc:mysql://accountsdb:3306/accountsdb"
+  LOANS_DATASOURCE_URL: "jdbc:mysql://loansdb:3306/loansdb"
+  CARDS_DATASOURCE_URL: "jdbc:mysql://cardsdb:3306/cardsdb"
+  EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: "http://eurekaserver:8070/eureka"
+  CONFIGSERVER_APPLICATION_NAME: "configserver"
+  EUREKA_APPLICATION_NAME: "eurekaserver"
+  ACCOUNTS_APPLICATION_NAME: "accounts"
+  LOANS_APPLICATION_NAME: "loans"
+  CARDS_APPLICATION_NAME: "cards"
+  GATEWAY_APPLICATION_NAME: "gatewayserver"
+  KC_BOOTSTRAP_ADMIN_USERNAME: "admin"
+  KC_BOOTSTRAP_ADMIN_PASSWORD: "admin"
+  SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK-SET-URI: "http://keycloak:7080/realms/master/protocol/openid-connect/certs"
+  SPRING_DATASOURCE_USERNAME: "root"
+  SPRING_DATASOURCE_PASSWORD: "root"
+```
+
+Feed this file to the Kubernetes cluster.
+```cmd
+kubectl apply -f kubernetes/configmaps.yaml
+```
+
+## Kubernetes manifest file to create ConfigMap.
+
+A Kubernetes ConfigMap is an essential Kubernetes resource used to store configuration data separately from the application code.
+
+The *apiVersion* and *kind* fields are required for all Kubernetes objects. When creating a configmap inside K8s, the kind should be "ConfigMap."
+
+The metadata field contains the name of ConfigMap and other metadata about the object.
+
+The data field is where the key-value pairs are stored. The keys can be any alphanumeric string, and the values can be strings, numbers, or binary data.
+
+## Kubernetes manifest file to deploy a Container
+
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: accounts-deployment
+  labels:
+    app: accounts
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: accounts
+  template:
+    metadata:
+      labels:
+        app: accounts
+    spec:
+      containers:
+        - name: accounts
+          image: baotuyloan1/accounts:h2sql
+          ports:
+            - containerPort: 8080
+          env:
+            - name: SPRING_APPLICATION_NAME
+              valueFrom:
+                configMapKeyRef:
+                  name: easybank-configmap
+                  key: ACCOUNTS_APPLICATION_NAME
+            - name: SPRING_PROFILES_ACTIVE
+              valueFrom:
+                configMapKeyRef:
+                  name: easybank-configmap
+                  key: SPRING_PROFILES_ACTIVE
+            - name: EUREKA_CLIENT_SERVICEURL_DEFAULTZONE
+              valueFrom:
+                configMapKeyRef:
+                  name: easybank-configmap
+                  key: EUREKA_CLIENT_SERVICEURL_DEFAULTZONE
+            - name: SPRING_CONFIG_IMPORT
+              valueFrom:
+                configMapKeyRef:
+                  name: easybank-configmap
+                  key: SPRING_CONFIG_IMPORT
+```
+
+In Kubernetes, a Deployment is a high-lavel resource used to manage the deployment and scaling of containerized applications. It provides a declarative way to define and maintain the desired state of your application.
+When you create a Deployment, Kubernetes ensures that the specified number of replicas of your application are running automatically handles scaling, rolling updates, and rollbacks.
+
+The *apiVersion* and *kind* fields are required for all Kubernetes objects. For deployment manifest file, the kind should be "Deployment".
+
+*metadata*: The metadata section contains information about the Deployment, such as its name and labels.
+
+*spec*: The spec section defines the desired state of the Deployment.
+
+*replicas*: The replicas field is the number of replicas containers should be running at any give time.
+
+*selector*: The selector field is used to select the pods controlled by this Deployment. In this case, it's using the label "app:accounts" to identify the pods.
+
+*template*: the template section specifies the pod template that will be used to create pods for this Deployment.
+
+*metadata*: The metadata section inside the template defines the labels for the pods. The pod will have the label "app:accounts".
+
+*spec*: This section inside the template specifies the details of the pod's specification.
+
+*ports*: The ports section exposes port of the container.
+
+## Kubernetes manifest file to create a service.
+
+In Kubernetes, a Service is an essential resource that provides network connectivity to a set of pods. It acts as a stable endpoint for acessing and load balancing traffic across multiple replicas of a pod.
+
+```yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: accounts-service
+  labels:
+    app: accounts
+spec:
+  selector:
+    app: accounts
+  type: ClusterIP
+  ports:
+    - protocol: TCP
+      port: 8080
+      targetPort: 8080
+```
+
+*selector*: The selector field is used to select the pods that the Service will route traffic to. In this case, it uses the label "app:accounts" to select the pods controlled by the Deployment with the same label.
+
+*Type*: The type field specifies the type of Service. In this case, it is set to "ClusterIP", which means that the Service will be accessible only from within the cluster.
+
+*Ports*: The ports section defines the ports that the Service should listen and forward traffic to.
+
+*protocol*: The protocol field specifies the protocol used for the service port.
+
+*port*: The Service will listen for incoming traffic.
+
+*targetPort*: The port number on the pods which the incoming traffic will be forwarded.
+
+![img_97.png](img_97.png)
