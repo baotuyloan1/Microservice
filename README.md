@@ -2126,6 +2126,7 @@ Show all the services inside the Kubernetes cluster
 kubectl get services
 ```
 
+Show all the replicaset inside the Kubernetes cluster
 ```cmd
 kubectl get replicaset
 ```
@@ -2286,3 +2287,140 @@ spec:
 *targetPort*: The port number on the pods which the incoming traffic will be forwarded.
 
 ![img_97.png](img_97.png)
+
+# Automatic Self healing inside Kubernetes cluster.
+
+The Kubernetes always putting the efforts to match the desired state with the current state.
+We can't achieve this self-healing capability with Docker or Docker compose.
+The container orchestration product Kubernetes will always keep an eye on the running containers.
+If any of the containers has some health issues, they're always going to take an action to make the desired state and current state matches with each other.
+
+To delete the specific pod:
+```cmd
+kubectl delete pod accounts-deployment-8bbc77bf4-xbhzt
+```
+
+To get all the events happened behind the scenes inside the Kubernetes cluster by sorting all of them based upon the Create timestamp.
+
+```cmd
+kubectl get events --sort-by=.metadata.creationTimestamp
+```
+
+![img_98.png](img_98.png)
+
+## Automatic Rollout and Rollback inside Kubernetes cluster.
+
+To scale my accounts-deployment to 1 (using CMD):
+```cmd
+kubectl scale deployment accounts-deployment --replicas=1
+```
+
+To get the details of the pod
+```cmd
+kubectl describe pod gatewayserver-deployment-7ccb47cdd4
+```
+To change image of the pod
+```cmd
+kubectl set image deployment gatewayserver-deployment gatewayserver=baotuyloan1/gatewayserver:nosecurity --record
+```
+gatewayserver: the name of the container in the deployment.
+gatewayserver-deployment: the name of the deployment.
+record: record the reason on why we are changing the new image.
+
+Or update the 8.gateway.yaml and use the apply command.
+
+The Kubernetes cluster did not disturb the other running pod. Because first the Kubernetes want to validate whether it is able to set up with the new image that we have provided.
+After validation, if my pod is successfully set up then it is going to terminate the old pod. 
+If you have three different gateway server containers, it is not going to kill all of them at once.
+If you have 50 different instances of the gateway server container. The Kubernetes cluster is going to deploy new changes in an incremental fashion, so that customers will not have any downtime.
+The Kubernetes is only going to kill the old pod when the new pod is successfully set up.
+
+*NOTE*: When apply new image by using the cmd command or the apply command, it is going to do automatically.
+
+## Roll back the previous version of the image.
+
+This cmd shows the history of the gatewayserver-deployment with having --record argument.
+```cmd
+kubectl rollout history deployment gatewayserver-deployment
+```
+![img_99.png](img_99.png)
+
+Any of the commands kubectl set image deployment ... --record will have when using the above command.
+
+```terminal
+kubectl rollout undo deployment gatewayserver-deployment --to-revision=8
+```
+![img_100.png](img_100.png)
+
+You can configure the maxSurge and maxUnavailable parameters in the Deployment to control how many Pods are created or terminated at the same time.
+
+```yaml
+strategy:
+  rollingUpdate:
+    maxSurge: 1        # Create 1 extra Pod temporarily during rollout
+    maxUnavailable: 1  # Allow 1 unavailable Pod during the update
+```
+
+# Horizontal Pod Autoscaling: https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale/
+
+This is a crucial feature. It is going to automatically scale up and scale down the pods based upon the traffic that is coming towards your microservice.
+You can define the requirements that you want to auto-scale your pods based upon some memory or CPU utilization of the pod.
+
+**Conclustion:** 
+1. First, we'll give all our instructions or specifications with the help of deployment object.
+2. Second, the deployment object will create the replicaset based upon the number of replicas that we have mentioned. So if I try to mention replicas as 2 or 5, my replicaset will create so many pods behind the scenes. 
+If my replicaset has value as 2, it is going to create 2 pods.
+3. Third, inside these two pods, the actual containers will be deployed.
+
+
+# Kubernetes service type
+
+Three major types of Kubernetes services:
+
+* ClusterIP
+* NodePort
+* LoadBalancer
+
+# K8s Cluster IP Service:
+
+If you don't mention the service type inside your Kubernetes manifest file, then this is that default.
+
+ClusterIP service creates an internal IP address for use within K8s cluster.
+
+![img_101.png](img_101.png)
+
+# K8s NODEPORT service:
+
+Services of type NodePort build on top of ClusterIP type services by exposing the ClusterIP service outside the cluster on high ports (default 30000-32767). 
+If no port number is specified, then the Kubernetes automatically selects a free port. The local kube-proxy is responsible for listening to the port on the node and forwarding client traffic on the NodePort to the ClusterIP.
+
+![img_102.png](img_102.png)
+
+Drawback of NodePort:
+- The external client applications have to know the IP address of the worker node.
+If one of the worker nodes has some issues, the Kubernetes automatically kills the worker node and it will bring a new worker node.
+That means it is going to get a new IP address.
+→ The client applications should always update their worker node IP address.
+
+That's why most of the people, they don't use NodePort service type. Instead they will go to the LoadBalancer service.
+
+# K8s LOADBALANCER service:
+
+This is very similar to the NodePort service. But on top of the NodePort service, the Kubernetes provides a load balancer.
+
+This load balancer will have a public IP address, which is never going to change until unless the Kubernetes admin changes the IP address.
+
+This public address can be mapped to a DNS name or to your domain name.
+
+To this domain name or to this public IP address, the client applications, they can send the traffic.
+
+Whenever the LoadBalancer is receiving the traffic, it will identify to which worker node it has to send the request.
+
+For example, the request will be forwarded to the NodePort. From the NodePort, the traffic will go to the ClusterIP.
+From the ClusterIP, the traffic will go to the actual microservice container.\
+
+**Advantages:**
+- The LoadBalancer is always going to be static with the IP address at the domain name that you have mapped.
+- It is always going to track what is happening inside the Kubernetes cluster.
+- If I try to increase the replicas to three, it may deploy it into another worker node. All those details will be tracked by this LoadBalancer and the request accordingly will be distributed.
+- Regardless of how many worker nodes you are trying to create inside the Kubernetes cluster, or how many worker nodes you are trying to delete them. Regardless of whatever is happening inside the Kubernetes cluster, it is not going to impact your client application in any way. Because the IP address of the LoadBalancer will not change.
