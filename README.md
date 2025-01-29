@@ -2488,3 +2488,35 @@ kubectl delete -f kubernetes/8_gateway.yaml
 - Creating these manifest files is make a lot of work for you.
 - Then run the cmd for applying is going to take a lot of time. Because we have to execute the apply command for every manifest file.
 - If you have 100 of microservices, you have 3 environments, you have to create 300 manifest files and run the apply command for 300 times.
+
+
+# Introduction to Helm
+
+Helm is a package manager for Kubernetes. The main objective of Helm is to help developers and DevOps team members to manage Kubernetes projects and deployments by offering a more efficient approach to handling the Kubernetes manifest files.
+
+The helm is going to follow a packaging format called Chart. 
+Chart is a collection of files that describes a related set of Kubernetes resources.
+Suppose, if you have 50 microservices, you can club all these 50 microservices related manifest files into a single component called Chart inside Helm.
+Using the same single chart, we can deploy a simple application or any kind of complex application
+With that; the maintenance of your Kubernetes deployments is going to be super easy.
+A chart can have a child charts or dependent charts as well.
+
+## Problems that Helm solves
+
+Without Helm, we need to maintain the separate YAMl files/manifest of K8s for all microserivces inside a project.
+The majority content inside them looks similar except a few dynamic values.
+
+
+With Helm, we can create a single template YAML file. Only the dynamic values will be injected during K8s services setup based upon the values mentioned inside the values.yaml present inside each service/chart.
+![img_103.png](img_103.png)
+
+The value that we have defined inside the values.yaml is going to be applied to the service template file at runtime and behind the scenes helm is going to automatically create the account microservice-specific service manifest file.
+Developers or DevOps team members should only provide the values.yaml file for each microservice. Behind based on these values, the Helm is going to generate the Kubernetes manifest files at runtime for all your microservices. 
+On top of that, we don't have to execute these Kubernetes manifest files manually.
+We can deploy all the microservices with a single command by helping Helm.
+
+**Advantages of Helm**:
+1. Helm supports packaging of YAML files into a single helm chart.
+2. THe helm chart can be distributed into a public repository or a private repository you can share with your team members.
+3. You can always deploy or upgrade or rollback or uninstall your entire microservice application into your Kubernetes cluster with a single command. No need to run any manual commands with the help of Kubectl.
+4. Helm supports release/version management. You can roll back your entire Kubernetes cluster not only a single manifest file.
