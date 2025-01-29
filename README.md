@@ -2424,3 +2424,67 @@ From the ClusterIP, the traffic will go to the actual microservice container.\
 - It is always going to track what is happening inside the Kubernetes cluster.
 - If I try to increase the replicas to three, it may deploy it into another worker node. All those details will be tracked by this LoadBalancer and the request accordingly will be distributed.
 - Regardless of how many worker nodes you are trying to create inside the Kubernetes cluster, or how many worker nodes you are trying to delete them. Regardless of whatever is happening inside the Kubernetes cluster, it is not going to impact your client application in any way. Because the IP address of the LoadBalancer will not change.
+
+Restart Kong
+```cmd
+kubectl -n kubernetes-dashboard rollout restart deployment kubernetes-dashboard-kong
+```
+
+To show exposed ports inside the Kubernetes cluster, using this command:
+```cmd
+kubectl get services
+```
+
+NodePort configuration
+```yaml
+spec:
+  selector:
+    app: accounts
+  type: NodePort
+  ports:
+    - protocol: TCP
+      port: 8080
+      targetPort: 8080
+```
+
+ClusterIP configuration
+```yaml
+spec:
+  selector:
+    app: accounts
+  type: ClusterIP
+  ports:
+    - protocol: TCP
+      port: 8080
+      targetPort: 8080
+```
+
+LoadBalancer configuration
+```yaml
+spec:
+  selector:
+    app: accounts
+  type: LoadBalancer
+  ports:
+    - protocol: TCP
+      port: 8080
+      targetPort: 8080
+```
+
+For 2 reasons, we should avoid exposing our microservices with the help of LoadBalancer.
+1. We need to secure our microservices so that no external clients can directly communicate with a microservice. They have to always come through the API gateway(edge server).
+2. Public IP addresses usually attract some cloud bills that we need to avoid.
+If we have hundereds of microservices, and if you try to expose them with a LoadBalancer type, your cloud provider will create difference 100 of LoadBalancers with a public IP address, which is going to attract a lot of bill.
+
+
+
+To delete the Deployment:
+```cmd
+kubectl delete -f kubernetes/8_gateway.yaml
+```
+
+**Conclusion:**
+- Managing all the manifest files inside the Kubernetes cluster is a nightmare when the Kubernetes cluster has a lot of microservices.
+- Creating these manifest files is make a lot of work for you.
+- Then run the cmd for applying is going to take a lot of time. Because we have to execute the apply command for every manifest file.
+- If you have 100 of microservices, you have 3 environments, you have to create 300 manifest files and run the apply command for 300 times.
