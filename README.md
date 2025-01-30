@@ -2520,3 +2520,70 @@ We can deploy all the microservices with a single command by helping Helm.
 2. THe helm chart can be distributed into a public repository or a private repository you can share with your team members.
 3. You can always deploy or upgrade or rollback or uninstall your entire microservice application into your Kubernetes cluster with a single command. No need to run any manual commands with the help of Kubectl.
 4. Helm supports release/version management. You can roll back your entire Kubernetes cluster not only a single manifest file.
+
+## Installing Helm: https://helm.sh/docs/intro/install/
+
+1. Prerequisites: 
+- A Kubernetes cluster.
+- Deciding what security configurations to apply to your installation, if any.
+- Installing and configuring Helm.
+
+List all the installation charts that we have done into the Kubernetes cluster.
+```cmd
+helm ls
+```
+![img_111.png](img_111.png)
+
+In the local, The Helm connects to the Kubernetes cluster by looking the Kubernetes cluster connection details by.
+Leverage this config details:
+
+![img_104.png](img_104.png)
+![img_105.png](img_105.png)
+
+The same connection details, Helm also is going to leverage whenever it wants to interact with a Kubernetes cluster.
+
+To search the charts available inside the public repository, we can use this cmd:
+```cmd
+helm search hub wordpress
+```
+The above command searches all WordPress charts on Artifact Hub.
+![img_106.png](img_106.png)
+
+We need to choose one of the repositories to install the WordPress helm chart.
+
+Before installing a Package, we need to make sure that we have added the Bitnami repo details inside our local system.
+Add the Bitnami repo to the local
+```cmd
+helm repo add bitnami https://charts.bitnami.com/bitnami
+```
+![img_107.png](img_107.png)
+
+To install a Package
+```cmd
+helm install happy-panda bitnami/wordpress
+```
+happy-panda: is going to be the name of the release. This name can be any thing.
+This command will install the chart available inside the Bitnami repo.
+
+![img_108.png](img_108.png)
+
+Focus on this folder to understand the structure of the Helm chart structure.
+![img_109.png](img_109.png)
+
+![img_110.png](img_110.png)
+Inside this parent folder WordPress, we have two YAML files and two subfolders.
+
+This chart.yaml file is going to have meta-information about the helm chart. Like chart version, author, etc.
+
+Inside the values.yaml, we need to maintain all the dynamic values that we want to inject at runtime into the template files.
+
+Inside this charts folder, we have other helm charts which my current chart is dependent on.
+
+In the templates folder, we are going to maintain all the required Kubernetes manifest template YAML files
+
+At run time my helm chart is going to inject all the dynamic values that we have mentioned inside the values.yaml
+
+To unistall the chart with the help of Helm:
+```cmd
+helm uninstall happy-panda
+```
