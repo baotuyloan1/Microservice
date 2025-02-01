@@ -17,7 +17,7 @@ In your Maven Java project, add the plugin to your pom.xml:
             <version>3.3.2</version>
             <configuration>
                 <to>
-                    <image>baotuyloan1/${project.artifactId}:241115</image>
+                    <image>baotuyloan1/${project.artifactId}:250130</image>
                 </to>
             </configuration>
         </plugin>

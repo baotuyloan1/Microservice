@@ -1,0 +1,24 @@
+deploymentName: gatewayserver-deployment
+serviceName: gatewayserver
+appLabel: gatewayserver
+appName: gatewayserver
+
+replicaCount: 2
+image:
+  repository: baotuyloan1/gatewayserver
+  tag: 250130
+
+containerPort: 8072
+
+service:
+  type: LoadBalancer
+  port: 8072
+  targetPort: 8072
+
+appname_enabled: true
+profile_enabled: true
+config_enabled: true
+eureka_enabled: true
+resource_enabled: true
+otel_enabled: true
+kafka_enabled: false

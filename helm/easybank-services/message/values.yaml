@@ -1,0 +1,24 @@
+deploymentName: message-deployment
+serviceName: message
+appLabel: message
+appName: message
+
+replicaCount: 1
+image:
+  repository: baotuyloan1/message
+  tag: 250130
+
+containerPort: 9010
+
+service:
+  type: ClusterIP
+  port: 9010
+  targetPort: 9010
+
+appname_enabled: true
+profile_enabled: false
+config_enabled: false
+eureka_enabled: false
+resource_enabled: false
+otel_enabled: true
+kafka_enabled: false

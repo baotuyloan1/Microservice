@@ -98,7 +98,7 @@
 				<version>3.3.2</version>
 				<configuration>
 					<to>
-						<image>baotuyloan1/${project.artifactId}:250116</image>
+						<image>baotuyloan1/${project.artifactId}:250130</image>
 					</to>
 				</configuration>
 			</plugin>
