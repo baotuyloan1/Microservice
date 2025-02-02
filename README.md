@@ -2615,3 +2615,15 @@ https://github.com/bitnami/charts.git
 
 This domain is going to be used for getting a public certificate in the resource server.
 ![img_114.png](img_114.png)
+
+To get all PVC:
+```cmd
+kubectl get pvc
+```
+
+To delete PVC (persistent volume claim)
+```cmd
+kubectl delete pvc data-happy-panda-mariadb-0
+```
+
+![img_115.png](img_115.png)
