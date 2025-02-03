@@ -2610,7 +2610,7 @@ helm template .
 
 ![img_113.png](img_113.png)
 
-Download this repo for integrating Grafana (Loki, Prometheus, Tempo)
+Download this repo for integrating Grafana (KeyCloak, Loki, Prometheus, Tempo,...)
 https://github.com/bitnami/charts.git
 
 This domain is going to be used for getting a public certificate in the resource server.
@@ -2627,3 +2627,60 @@ kubectl delete pvc data-happy-panda-mariadb-0
 ```
 
 ![img_115.png](img_115.png)
+
+Note to install Keycloak to the Kubernetes cluster:
+
+![img_116.png](img_116.png)
+
+![img_117.png](img_117.png)
+
+Note to install Kafka to the Kubernetes cluster:
+
+![img_118.png](img_118.png)
+
+Note to install Prometheus to the Kubernetes cluster:
+
+![img_119.png](img_119.png)
+
+Note to install Loki to the Kubernetes cluster: nothing :D
+
+Note to install Grafana Tempo to the Kubernetes cluster:
+
+![img_120.png](img_120.png)
+
+But each microservice needs a tempo URL to the open telemetry server.
+
+To get the tempo URL:
+
+Run this command:
+
+```cmd
+kubectl get services
+```
+
+![img_123.png](img_123.png)
+
+The service that our open telemetry should connect is this distributor.
+
+Note to install Grafana with datasource (similar datasource.yaml in Grafana):
+
+![img_125.png](img_125.png)
+
+Because the Account uses the 8080 port when typing LoadBalancer. So run this cmd to forward the port 3000 in the inside system to 3000 in the outside system:
+```cmd
+kubectl port-forward svc/grafana 3000:3000
+```
+
+To get password for grafana:
+
+```cmd
+echo "Password: $(kubectl get secret grafana-admin --namespace default -o jsonpath="{.data.GF_SECURITY_ADMIN_PASSWORD}" | base64 -d)"
+```
+
+To show all the releases or all the installations that we have done with the help of Helm:
+```cmd
+helm ls
+```
+
+![img_126.png](img_126.png)
+
