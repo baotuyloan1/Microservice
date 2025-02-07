@@ -7,9 +7,10 @@ data:
   SPRING_PROFILES_ACTIVE: {{ .Values.global.activeProfile }}
   SPRING_CONFIG_IMPORT: {{ .Values.global.configServerURL }}
   EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: {{ .Values.global.eurekaServerURL}}
-  SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK: {{.Values.global.keyCloakURL}}
-  JAVA_TOOL_OPTIONS: {{ .Values.global.openTelemeryJavaAgent}}
+  SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK-SET-URI: {{.Values.global.keyCloakURL}}
+  JAVA_TOOL_OPTIONS: {{ .Values.global.openTelemetryJavaAgent}}
   OTEL_EXPORTER_OTLP_ENDPOINT: {{ .Values.global.otelExporterEndPoint}}
   OTEL_METRICS_EXPORTER: {{.Values.global.otelMetricsExporter}}
   SPRING_CLOUD_STREAM_KAFKA_BINDER_BROKERS: {{.Values.global.kafkaBrokerURL}}
+  SPRING_RABBITMQ_HOST: {{.Values.global.rabbitmqHost}}
   {{- end -}}

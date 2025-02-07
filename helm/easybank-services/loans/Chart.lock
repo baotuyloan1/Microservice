@@ -2,5 +2,8 @@ dependencies:
 - name: easybank-common
   repository: file://../../easybank-common
   version: 0.1.0
-digest: sha256:0660b1bedda2da149f73cab639dedffe6ae7b4ed613146294da280eb67b9f42f
-generated: "2025-01-30T23:00:04.8764512+07:00"
+- name: loansdb
+  repository: file://../loansdb
+  version: 0.1.0
+digest: sha256:1ae7ced3f19b6e749ea71cd3f32618405e24273aac9fe5bea124e7fb2af1f2a1
+generated: "2025-02-03T16:47:40.4480452+07:00"

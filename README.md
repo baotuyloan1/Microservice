@@ -2684,3 +2684,26 @@ helm ls
 
 ![img_126.png](img_126.png)
 
+To deploy all remaining our microservices use this command:
+```cmd
+helm install easybank prod-env
+```
+
+![img_127.png](img_127.png)
+
+To install rabbitmq use these commands:
+
+1. Install rabbitmq
+```cmd
+helm install rabbitmq bitnami/rabbitmq
+```
+
+2. Add user "guest" to rabbitmq for communicating with other microservices
+
+```cmd
+kubectl exec -it rabbitmq-0 -- rabbitmqctl add_user guest guest
+kubectl exec -it rabbitmq-0 -- rabbitmqctl set_permissions -p / guest ".*" ".*" ".*"
+kubectl exec -it rabbitmq-0 -- rabbitmqctl set_user_tags guest administrator
+
+```
+

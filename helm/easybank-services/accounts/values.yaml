@@ -3,6 +3,7 @@ serviceName: accounts
 appLabel: accounts
 appName: accounts
 
+
 replicaCount: 2
 image:
   repository: baotuyloan1/accounts
@@ -22,3 +23,11 @@ eureka_enabled: true
 resource_enabled: false
 otel_enabled: true
 kafka_enabled: true
+
+datasource_enabled: true
+datasource_root_password: root
+database_enabled: false
+mysqlDatabase: accountsdb
+springDatasourceUsername: root
+springDatasourcePassword:  root
+datasourceUrl: jdbc:mysql://accountsdb:3306/accountsdb

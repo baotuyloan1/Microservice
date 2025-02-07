@@ -1,0 +1,33 @@
+deploymentName: loansdb-deployment
+serviceName: loansdb
+appLabel: loansdb
+appName: loansdb
+
+replicaCount: 1
+image:
+  repository: mysql
+  tag: latest
+
+containerPort: 3306
+
+service:
+  type: LoadBalancer
+  port: 3307
+  targetPort: 3306
+
+appname_enabled: true
+profile_enabled: false
+config_enabled: false
+eureka_enabled: false
+resource_enabled: false
+otel_enabled: false
+kafka_enabled: false
+
+
+datasource_enabled: false
+datasource_root_password: root
+database_enabled: true
+mysqlDatabase: loansdb
+springDatasourceUsername: root
+springDatasourcePassword:  root
+datasourceUrl: jdbc:mysql://loansdb:3306/loansdb

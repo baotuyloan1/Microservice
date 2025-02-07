@@ -6,7 +6,7 @@ appName: message
 replicaCount: 1
 image:
   repository: baotuyloan1/message
-  tag: 250130
+  tag: 250122
 
 containerPort: 9010
 
@@ -20,5 +20,14 @@ profile_enabled: false
 config_enabled: false
 eureka_enabled: false
 resource_enabled: false
-otel_enabled: true
-kafka_enabled: false
+otel_enabled: false
+kafka_enabled: true
+
+
+datasource_enabled: false
+datasource_root_password: root
+database_enabled: false
+mysqlDatabase: loansdb
+springDatasourceUsername: root
+springDatasourcePassword:  root
+datasourceUrl: jdbc:mysql://loansdb:3306

@@ -47,12 +47,12 @@ spec:
                 name: {{ .Values.global.configMapName }}
                 key: EUREKA_CLIENT_SERVICEURL_DEFAULTZONE
           {{- end }}
-          {{- if .Values.resourceserver_enabled }}
-          - name: SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK
+          {{- if .Values.resource_enabled }}
+          - name: SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK-SET-URI
             valueFrom:
               configMapKeyRef:
                 name: {{ .Values.global.configMapName }}
-                key: SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK
+                key: SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK-SET-URI
           {{- end }}
           {{- if .Values.otel_enabled}}
           - name: JAVA_TOOL_OPTIONS
@@ -80,4 +80,23 @@ spec:
                 name:  {{ .Values.global.configMapName }}
                 key: SPRING_CLOUD_STREAM_KAFKA_BINDER_BROKERS
           {{- end}}
+          {{- if .Values.datasource_enabled }}
+          - name: SPRING_DATASOURCE_URL
+            value: {{ .Values.datasourceUrl }}
+          - name: SPRING_DATASOURCE_USERNAME
+            value: {{ .Values.springDatasourceUsername }}
+          - name: SPRING_DATASOURCE_PASSWORD
+            value: {{ .Values.springDatasourcePassword }}
+          {{- end}}
+          {{- if  .Values.database_enabled }}
+          - name: MYSQL_DATABASE
+            value: {{ .Values.mysqlDatabase }}
+          - name: MYSQL_ROOT_PASSWORD
+            value: {{ .Values.datasource_root_password }}
+          {{- end}}
+          - name: SPRING_RABBITMQ_HOST
+            valueFrom:
+              configMapKeyRef:
+                name: {{ .Values.global.configMapName }}
+                key: SPRING_RABBITMQ_HOST
   {{- end}}

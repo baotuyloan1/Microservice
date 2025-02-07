@@ -22,3 +22,12 @@ eureka_enabled: true
 resource_enabled: false
 otel_enabled: true
 kafka_enabled: false
+
+
+datasource_enabled: true
+datasource_root_password: root
+database_enabled: false
+mysqlDatabase: cardsdb
+springDatasourceUsername: root
+springDatasourcePassword:  root
+datasourceUrl: jdbc:mysql://cardsdb:3308/cardsdb
