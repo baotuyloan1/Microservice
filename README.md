@@ -2707,3 +2707,26 @@ kubectl exec -it rabbitmq-0 -- rabbitmqctl set_user_tags guest administrator
 
 ```
 
+To upgrade new changes into the Kubernetes cluster with the help of Helm:
+
+```cmd
+helm upgrade easybank prod-env
+```
+
+To show the history of upgrades or installations happen for a particular Helm chart.
+
+```cmd
+helm history easybank
+```
+
+To rollback easybank to the previous version of the Helm chart
+
+```cmd
+helm rollback easybank 1
+```
+
+![img_129.png](img_129.png)
+
+## IMPORTANT Helm commands:
+
+![img_130.png](img_130.png)
