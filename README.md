@@ -2730,3 +2730,16 @@ helm rollback easybank 1
 ## IMPORTANT Helm commands:
 
 ![img_130.png](img_130.png)
+
+# Server-side service discovery and load balancing
+
+![img_131.png](img_131.png)
+
+
+Reference Spring Cloud Kubernetes blog: https://spring.io/blog/2021/10/26/new-features-for-spring-cloud-kubernetes-in-spring-cloud-2021-0-0-m3
+
+
+![img_132.png](img_132.png)
+
+![img_133.png](img_133.png)
+
