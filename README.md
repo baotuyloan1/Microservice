@@ -2,7 +2,6 @@ The reason is microservices architecture makes applications easier to scale, fas
 With all these reasons, microservice is going to be a demanding skill set for next few years.
 
 AGENDA:
-- Welcome to the world of Microservices
 - Building microservices business lgoic using Spring Boot
 - How to we right size our microservices & identify boundaries.
 - How to containerize our microservices using Docker
